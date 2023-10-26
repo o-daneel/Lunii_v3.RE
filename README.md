@@ -6,9 +6,13 @@ Even if you don't, children will 😁**
 
 # Sections
 
-1. [Hardware](HARDWARE.md)
-2. [Firmware analysis](ANALYSIS.md)
-3. [Ciphering reverse](CIPHERING.md)
+1. Lunii v2
+   1. [Hardware](HARDWARE_v2.md)
+   2. [Firmware analysis](ANALYSIS.md)
+   3. [Ciphering reverse](CIPHERING_v2.md)
+2. Lunii v2
+   1. [Hardware](HARDWARE_v3.md)
+   3. [Ciphering reverse](CIPHERING_v3.md)
 
 
 # TL;DR
@@ -68,6 +72,7 @@ Many people doesn't care about about software security. There Lunii's company fa
 # Links / Similar repos
 * [Lunii - Pack Manager CLI](https://github.com/o-daneel/Lunii.PACKS)
 * [TBD Lunii 1/2](https://www.youtube.com/watch?v=ZeYKieOIsC8&t=9s) - [TBD Lunii 2/2](https://www.youtube.com/watch?v=GItJg34bOk0)
+* [LuniiOs](https://github.com/bastien8060/Lumiios) - a python player implementation
 * [linux-cli](https://github.com/Wameuh/lunii-cli) (Did the same reverse analysis 😥 in July 2022, i'm late)
 * [(Hackday) Tsukuyomi Hacking Lunii](https://hackaday.io/project/167629-tsukuyomi)
 * [(GitHub) Tsukuyomi](https://github.com/danksz/tsukuyomi)
