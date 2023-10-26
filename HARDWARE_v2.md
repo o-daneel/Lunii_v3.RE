@@ -11,6 +11,8 @@
     -   [PM0253 - Programming manual](docs/pm0253-stm32f7-series-and-stm32h7-series-cortexm7-processor-programming-manual-stmicroelectronics.pdf)
 * External Flash : adesto AT25SF041 - 512MB
   QSPI interface
+  * [Datasheet](docs/AT25SF041-Adesto.pdf)
+
 * SD 16GB (SDIO interface)
 * ST25DV04K (I2C interface)
   * [Datasheet](docs/st25dv04k.pdf)
@@ -38,13 +40,13 @@ Check for pin mapping (UART4)
 # Pictures
 
 ## Main Board
-![Board](resources/pictures/Board.jpg)
+![Board](resources/pictures/v2/Board.jpg)
 
 ## STM32F730Z8T6
-![STM32](resources/pictures/STM32.jpg)
+![STM32](resources/pictures/v2/STM32.jpg)
 
 ## External Flash & NFC Frontend
-![ExtFlash_NFC](resources/pictures/ExtFlash_NFC.jpg)
+![ExtFlash_NFC](resources/pictures/v2/ExtFlash_NFC.jpg)
 
 ## Battery
-![Battery](resources/pictures/Battery.jpg)
+![Battery](resources/pictures/v2/Battery.jpg)
