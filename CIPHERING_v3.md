@@ -10,6 +10,7 @@
 ## Facts
 * previous v2 ciphering does no longer applies.
 * still only on 512B headers, no more
+* AES peripheral used in FW
 
 ## Assumptions 
 
@@ -18,4 +19,3 @@
    2. hardcoded key has been modified ==> TBC with FW dump
 2. Crypto algorithm has been replaced by an AES
    * Could be CBC and 128b
-3. 

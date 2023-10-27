@@ -6,12 +6,13 @@ Even if you don't, children will 😁**
 
 # Sections
 
-1. Lunii v2
+* Lunii v2
    1. [Hardware](HARDWARE_v2.md)
    2. [Firmware analysis](ANALYSIS.md)
    3. [Ciphering reverse](CIPHERING_v2.md)
-2. Lunii v2
+* Lunii v3
    1. [Hardware](HARDWARE_v3.md)
+   2. [Analysis](ANALYSIS_v3.md)
    3. [Ciphering reverse](CIPHERING_v3.md)
 
 
@@ -26,7 +27,19 @@ Many people doesn't care about about software security. There Lunii's company fa
 
 # Work in Progress
 
-### TODO
+### TODO v3
+* Ghidra on FW dump
+  * update HW section based on FW
+  * import symbols from v2 : WIP
+  * identify update decipher
+  * identify header decipher
+  * locate AES Key
+    * STM32 AES sample code usage (for structs)
+    * review Lunii AES usage
+* AES crypto : **confirmed**
+* check XXTEA on new v3 files : **FAILED**
+
+### TODO v2
 * Describe test mode / Try it
 * Deep dive in file section to understand format
   * .nm : Night mode (to be tested)
