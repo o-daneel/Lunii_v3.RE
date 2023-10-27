@@ -33,6 +33,10 @@
     - [Audio : MP3](#audio--mp3)
     - [Indexes](#indexes)
   - [Files Format](#files-format)
+    - [/.bgt](#bgt)
+    - [/wifi.prefs](#wifiprefs)
+    - [/cmd](#cmd)
+    - [/version](#version)
     - [.md](#md)
     - [.pi](#pi)
     - [.cfg](#cfg)
@@ -386,6 +390,14 @@ Indexes files :
 4) **si** : [Story index](#contentxxxxyyyysi)
 
 ## Files Format
+### /.bgt
+Brightness
+
+### /wifi.prefs
+### /cmd
+### /version
+
+
 ### .md
 * **Length** : 0x200
 * **Key** : plain / generic

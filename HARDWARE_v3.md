@@ -1,5 +1,6 @@
 
 # Hardware
+(based on FW analysis + pictures of board)
 
 * Battery : Li-ion 4.2v 600mAh   
   Model 503040 - 1INP5/31/41

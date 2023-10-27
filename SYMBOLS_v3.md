@@ -26,12 +26,25 @@ st_word
 clst2sect
 ld_clust
 st_clust
-
-
+remove_chain
+f_write
+f_close
+f_sync
+sync_fs
+disk_ioctl
 
 ### Audio
 | Name | Location | Type | Namespace | Source | Ref count |
 | --- | --- | --- | :---: | --- | ---: |
+set_hp_level
+set_volume
+task_audio_loop
+task_wheel_mode
+task_esp_parser
+task_play_story
+task_menu
+task_access_point
+task_battery_charge
 
 ### Screen
 | Name | Location | Type | Namespace | Source | Ref count |
@@ -44,6 +57,20 @@ st_clust
 ### Others
 | Name | Location | Type | Namespace | Source | Ref count |
 | --- | --- | --- | :---: | --- | ---: |
+get_battery_level
+ADC_MGR_Read_BatteryVoltage
+
+### Standard libs
+| Name | Location | Type | Namespace | Source | Ref count |
+| --- | --- | --- | :---: | --- | ---: |
+memset
+sprintf
+printf
+printf_level
+strlen
+memcpy
+strncpy
+strcat
 
 ## Core
 
