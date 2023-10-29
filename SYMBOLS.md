@@ -35,7 +35,7 @@ VectorTable
 One for each firmware:
 * boot - `0x0800 0000`
 * main - `0x9000 0000`
-* backup - `0x8000 0000`
+* backup - `0x9004 0000`
 
 See chapter [9.1.2 Interrupt and exception vectors ](docs/rm0431-stm32f72xxx-and-stm32f73xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
 
