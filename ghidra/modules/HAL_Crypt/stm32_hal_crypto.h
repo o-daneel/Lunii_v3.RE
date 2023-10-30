@@ -204,8 +204,8 @@ typedef struct __CRYP_HandleTypeDef
   HAL_CRYP_PHASETypeDef  Phase;            /*!< CRYP peripheral phase */
   void      *hdmain;          /*!< CRYP In DMA handle parameters */
   void      *hdmaout;         /*!< CRYP Out DMA handle parameters */
-  HAL_LockTypeDef       Lock;             /*!< CRYP locking object */
-  HAL_CRYP_STATETypeDef State;            /*!< CRYP peripheral state */
+  uint16_t  Lock;             /*!< CRYP locking object */
+  uint16_t  State;            /*!< CRYP peripheral state */
   HAL_CRYP_ERRORTypeDef ErrorCode;        /*!< CRYP peripheral error code */
   uint32_t    KeyIVConfig;      /*!< CRYP peripheral Key and IV configuration flag, used when
                                      configuration can be skipped */

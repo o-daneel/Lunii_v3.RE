@@ -37,8 +37,8 @@ struct CMD_LIST {
 };
 
 typedef enum CRYPTO_MODE {
-    KEY_B=0,
-    KEY_A=1,
+    KEY_DEVICE=0,
+    KEY_GENERIC=1,
     KEY_NONE=2
 } CRYPTO_MODE;
 
@@ -70,6 +70,30 @@ struct story_node {
     int audio_si_idx; /* index in si file */
     int next_node; /* index loaded from li for next in ni */
     int next_node_cnt; /* how many choices for next_node */
+    int undef_1;
+    int undef_2;
+};
+
+typedef enum RTOS_osPriority {
+    osPriorityIdle = -3,
+    osPriorityLow = -2,
+    osPriorityBelowNormal = -1,
+    osPriorityNormal = 0,
+    osPriorityAboveNormal = +1,
+    osPriorityHigh = +2,
+    osPriorityRealtime = +3,
+    osPriorityError = 0x84
+} RTOS_osPriority;
+
+struct RTOS_Task {
+    char * name;
+    pointer entrypoint;
+    // void (entrypoint)();
+    RTOS_osPriority priority;
+    uint params;
+    uint stack_size;
+    byte * buffer1;
+    byte * buffer2;
 };
 
 typedef struct VectorTable VectorTable, *PVectorTable;

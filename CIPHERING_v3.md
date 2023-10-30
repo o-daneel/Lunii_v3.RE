@@ -23,7 +23,7 @@
    1. ~~more rounds ==> NOPE (tested from 0 to 9)~~
    2. ~~hardcoded key has been modified ==> TBC with FW dump~~
 2. Crypto algorithm has been replaced by an AES
-   * Could be CBC and 128b
+   * Could be CBC and 128b : it is ✅
 
 ## Attack path
 
@@ -31,7 +31,8 @@
 1. 🚧 Dump Analysis with Ghidra (for an hardcoded key)  
    => looking for both, generic and specific keys 
 2. Flash content update to dump keys
-3. Performing attack on AES with a Known Plain text  
+3. ST NFC chip replacement for changing mode (prod/test/idle)
+4. Performing attack on AES with a Known Plain text  
    => requires a mean to generate as many ciphered as required with specific patterns in plain
 
 ### 🚧 Dump Analysis
