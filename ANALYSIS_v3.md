@@ -12,6 +12,8 @@
   - [Debug commands](#debug-commands)
     - [Handlers](#handlers)
     - [List](#list)
+- [Wifi](#wifi)
+  - [Commands](#commands)
 - [Security study](#security-study)
   - [Ghidra Project](#ghidra-project)
     - [How to import](#how-to-import)
@@ -33,7 +35,7 @@
     - [Audio : MP3](#audio--mp3)
     - [Indexes](#indexes)
   - [Files Format](#files-format)
-    - [/.bgt](#bgt)
+    - [.bgt](#bgt)
     - [/wifi.prefs](#wifiprefs)
     - [/cmd](#cmd)
     - [/version](#version)
@@ -169,6 +171,14 @@ Each CMD_LIST is made of :
 - SDCARD_CHECKSUM
 - SDCARD_VERSION
 
+# Wifi
+## Commands
+FACTORY_RESET
+REMOVE_WIFI
+LIST_WIFI
+ADD_WIFI
+LINK_FAH
+
 # Security study
 
 ## Ghidra Project
@@ -292,16 +302,48 @@ TODO
 
 | Address | Label | Image |
 |-|-|-|
-| 0x9001C04E | BITMAP_DAY_MODE | <img src="dump/bitmaps/DayMode.bmp" width="100"> |
-| 0x9001D37E | BITMAP_LUNII_ERROR | <img src="dump/bitmaps/LuniiError.bmp" width="100"> |
-| 0x9001EB94 | BITMAP_LUNII | <img src="dump/bitmaps/Lunii.bmp" width="100"> |
-| 0x9001FF32 | BITMAP_LOW_BATTERY | <img src="dump/bitmaps/LowBattery.bmp" width="100"> |
-| 0x900215F4 | BITMAP_MODE_TEST | <img src="dump/bitmaps/ModeTest.bmp" width="100"> |
-| 0x90023C3A | BITMAP_NIGHT_MODE | <img src="dump/bitmaps/NightMode.bmp" width="100"> |
-| 0x90024C18 | BITMAP_NOSDCARD | <img src="dump/bitmaps/NoSD.bmp" width="100"> |
-| 0x900262A4 | BITMAP_SDERROR | <img src="dump/bitmaps/SDError.bmp" width="100"> |
-| 0x90027B80 | BITMAP_LUNII_APP | <img src="dump/bitmaps/LuniiApp.bmp" width="100"> |
-| 0x90028F12 | BITMAP_USB | <img src="dump/bitmaps/USB.bmp" width="100"> |
+| `0x9006B9DC` | BITMAP_ABOUT | <img src="dump/_v3/res/BITMAP_ABOUT.bmp" width="100"> |
+| `0x9006FCF2` | BITMAP_BACKLIGHT_1 | <img src="dump/_v3/res/BITMAP_BACKLIGHT_1.bmp" width="100"> |
+| `0x90071048` | BITMAP_BACKLIGHT_2 | <img src="dump/_v3/res/BITMAP_BACKLIGHT_2.bmp" width="100"> |
+| `0x90072436` | BITMAP_BACKLIGHT_3 | <img src="dump/_v3/res/BITMAP_BACKLIGHT_3.bmp" width="100"> |
+| `0x9006E78E` | BITMAP_BACKLIGHT_4 | <img src="dump/_v3/res/BITMAP_BACKLIGHT_4.bmp" width="100"> |
+| `0x900738CA` | BITMAP_BACKLIGHT_OK | <img src="dump/_v3/res/BITMAP_BACKLIGHT_OK.bmp" width="100"> |
+| `0x9003D278` | BITMAP_BATT_CHARGE_1 | <img src="dump/_v3/res/BITMAP_BATT_CHARGE_1.bmp" width="100"> |
+| `0x9003901E` | BITMAP_BATT_CHARGE_2 | <img src="dump/_v3/res/BITMAP_BATT_CHARGE_2.bmp" width="100"> |
+| `0x9003A40C` | BITMAP_BATT_CHARGE_3 | <img src="dump/_v3/res/BITMAP_BATT_CHARGE_3.bmp" width="100"> |
+| `0x9003BA2A` | BITMAP_BATT_CHARGE_4 | <img src="dump/_v3/res/BITMAP_BATT_CHARGE_4.bmp" width="100"> |
+| `0x9003759E` | BITMAP_BATT_CHARGE_DONE | <img src="dump/_v3/res/BITMAP_BATT_CHARGE_DONE.bmp" width="100"> |
+| `0x9003EA3E` | BITMAP_BATT_CHARGE | <img src="dump/_v3/res/BITMAP_BATT_CHARGE.bmp" width="100"> |
+| `0x9006C93C` | BITMAP_BATT_EMTPY | <img src="dump/_v3/res/BITMAP_BATT_EMTPY.bmp" width="100"> |
+| `0x900684A6` | BITMAP_BLACK | <img src="dump/_v3/res/BITMAP_BLACK.bmp" width="100"> |
+| `0x90041BF6` | BITMAP_CONNECT_PC | <img src="dump/_v3/res/BITMAP_CONNECT_PC.bmp" width="100"> |
+| `0x900405C4` | BITMAP_LOW_BATTERY | <img src="dump/_v3/res/BITMAP_LOW_BATTERY.bmp" width="100"> |
+| `0x9004340C` | BITMAP_LUNII_1 | <img src="dump/_v3/res/BITMAP_LUNII_1.bmp" width="100"> |
+| `0x9004B16E` | BITMAP_LUNII_2 | <img src="dump/_v3/res/BITMAP_LUNII_2.bmp" width="100"> |
+| `0x90068AC2` | BITMAP_MIRE | <img src="dump/_v3/res/BITMAP_MIRE.bmp" width="100"> |
+| `0x900751F0` | BITMAP_MODE_DAY | <img src="dump/_v3/res/BITMAP_MODE_DAY.bmp" width="100"> |
+| `0x900782B2` | BITMAP_MODE_NIGHT | <img src="dump/_v3/res/BITMAP_MODE_NIGHT.bmp" width="100"> |
+| `0x9006915E` | BITMAP_MODE_TEST | <img src="dump/_v3/res/BITMAP_MODE_TEST.bmp" width="100"> |
+| `0x90081804` | BITMAP_NO_WIFI | <img src="dump/_v3/res/BITMAP_NO_WIFI.bmp" width="100"> |
+| `0x900447AA` | BITMAP_NOSDCARD | <img src="dump/_v3/res/BITMAP_NOSDCARD.bmp" width="100"> |
+| `0x90066DB2` | BITMAP_FACTORY_RESET | <img src="dump/_v3/res/BITMAP_FACTORY_RESET.bmp" width="100"> |
+| `0x90045E36` | BITMAP_SDERROR | <img src="dump/_v3/res/BITMAP_SDERROR.bmp" width="100"> |
+| `0x9007B74C` | BITMAP_SETTINGS | <img src="dump/_v3/res/BITMAP_SETTINGS.bmp" width="100"> |
+| `0x90047712` | BITMAP_STORY_ERROR | <img src="dump/_v3/res/BITMAP_STORY_ERROR.bmp" width="100"> |
+| `0x90086DA6` | BITMAP_SYNC_1 | <img src="dump/_v3/res/BITMAP_SYNC_1.bmp" width="100"> |
+| `0x90088A78` | BITMAP_SYNC_2 | <img src="dump/_v3/res/BITMAP_SYNC_2.bmp" width="100"> |
+| `0x9008A97C` | BITMAP_SYNC_3 | <img src="dump/_v3/res/BITMAP_SYNC_3.bmp" width="100"> |
+| `0x9008CC8E` | BITMAP_SYNC_4 | <img src="dump/_v3/res/BITMAP_SYNC_4.bmp" width="100"> |
+| `0x900850F6` | BITMAP_SYNC_DONE | <img src="dump/_v3/res/BITMAP_SYNC_DONE.bmp" width="100"> |
+| `0x90083242` | BITMAP_SYNC_FAILED | <img src="dump/_v3/res/BITMAP_SYNC_FAILED.bmp" width="100"> |
+| `0x9007D208` | BITMAP_SYNC_OK | <img src="dump/_v3/res/BITMAP_SYNC_OK.bmp" width="100"> |
+| `0x90049352` | BITMAP_USB | <img src="dump/_v3/res/BITMAP_USB.bmp" width="100"> |
+| `0x90076C40` | BITMAP_VERSION | <img src="dump/_v3/res/BITMAP_VERSION.bmp" width="100"> |
+| `0x90061838` | BITMAP_WIFI_1 | <img src="dump/_v3/res/BITMAP_WIFI_1.bmp" width="100"> |
+| `0x9006349A` | BITMAP_WIFI_2 | <img src="dump/_v3/res/BITMAP_WIFI_2.bmp" width="100"> |
+| `0x900650FE` | BITMAP_WIFI_3 | <img src="dump/_v3/res/BITMAP_WIFI_3.bmp" width="100"> |
+| `0x9005FB88` | BITMAP_WIFI_DONE | <img src="dump/_v3/res/BITMAP_WIFI_DONE.bmp" width="100"> |
+| `0x900799BA` | BITMAP_WIFI_OK | <img src="dump/_v3/res/BITMAP_WIFI_OK.bmp" width="100"> |
 
 ### MP3 
 | Address | Size | Label | 
@@ -396,8 +438,13 @@ Indexes files :
 4) **si** : [Story index](#contentxxxxyyyysi)
 
 ## Files Format
-### /.bgt
-Brightness
+### .bgt
+* **Length** : 0x01
+* **Key** : None
+
+
+This is a config file to store brightness level. Fixed size of 1 Byte, no ciphering applied on it.  
+The brightness must be in range `0-100`
 
 ### /wifi.prefs
 ### /cmd
@@ -463,12 +510,14 @@ File is made of 8 tags :
 | 0 | WORD | WORD | 300s | 3600s | idle time before sleep mode |
 | 1 | WORD | WORD | 60s | 600s | TBD |
 | 2 | WORD | WORD | 5s | 10s | Time to display Low battery message |
-| 3 | WORD | WORD | 0 | | Night mode - Enable |
+| 3 | WORD | BYTE | 0 | | Night mode - Enable |
 | 4 | WORD | WORD | 0 | | Night mode - Volume level |
 | 5 | WORD | WORD | 3 | | Night mode - Stories to play before auto sleep mode |
 | 6 | WORD | WORD | ? | | Boolean related to 05<br>If True => (uint)CFG_TAG_04) / (CFG_TAG_05 - 1) |
-| 7 | WORD | WORD | 1 | | TBD |
-| 8 | WORD | WORD | 1 | | Request to recreate `.nm` file |
+| 7 | WORD | BYTE | 1 | | TBD |
+| 8 | WORD | BYTE | 1 | | Request to recreate `.nm` file |
+| 9 | WORD | BYTE | 1 | | related to `uplugged` file |
+| 10 | WORD | WORD | ? | | Brightness Level read from `.bgt` |
 
 Constraints can be retreived in the function `LUNII_load_config()`
 
