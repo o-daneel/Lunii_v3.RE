@@ -12,6 +12,14 @@ typedef unsigned short    undefined2;
 typedef unsigned int    undefined4;
 typedef unsigned long long    undefined8;
 typedef unsigned short    ushort;
+
+typedef enum ESP32_AP_ENC {
+    OPEN=0,
+    WPA_PSK=2,
+    WPA2_PSK=3,
+    WPA_WPA2_PSK=4,
+} ESP32_AP_ENC;
+
 typedef enum AUDIO_HP_LEVEL {
     HP_OFF=0,
     HP_ON=1

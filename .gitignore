@@ -3,11 +3,16 @@
 ghidra/Lunii*.rep
 ghidra/Lunii*.gpr
 ghidra/Lunii*.lock*
-resources/pictures/*.jpg
+resources/pictures/**/*.jpg
 dump/*
 ida
+*.exe
+*.rar
+*.obj
+
 # tools/
 tools/lunii-packs
+tools/lunii-qt
 tools/lunii-cli
 tools/SVD*
 tools/STM*

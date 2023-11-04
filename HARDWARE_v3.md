@@ -16,14 +16,31 @@
 
 To be checked
 * Voltage Regulator : AP7362 (DIODES) 4.2v -> 3.3v
-* Battery Management System (BMS) : MCP73833
+* Battery Management System (BMS) :  
+  * MCP73833
+  * 
 * SD 16GB (SDIO interface)
 * ST25DV04K (I2C interface)
   * [Datasheet](docs/st25dv04k.pdf)
   * [AN5439 - Application note](docs/an5439-augmented-ndef-with-st25dvi2c-series-dynamic-nfc-tags-stmicroelectronics.pdf)
-* Audio ampli : PAM8019
+* Audio ampli : 
+  * PAM8019
+  * MAX9792
 
 ## Peripherals Mapping
+| Peripheral | GPIOx | mask |
+|-|-|-|
+| Button 1 | GPIO **A** | `0x00000004` |
+| Button 2 | GPIO **C** | `0x00000002` |
+| Button 3 | GPIO **C** | `0x00002000` |
+| Rotary Wheel U | GPIO **D** | `0x00000800` |
+| Rotary Wheel D | GPIO **D** | `0x00002000` |
+| Rotary Wheel L | GPIO **D** | `0x00000400` |
+| Rotary Wheel R | GPIO **D** | `0x00001000` |
+| USB connected | GPIO **B** | `0x00002000` |
+| HW vers 1/2 | GPIO **D** | `0x00000001` |
+| HW vers 2/2 | GPIO **D** | `0x00000002` |
+
 (recovered from `TM_dump_sate`)
 * GPIOA
   - Audio Jack inserted
