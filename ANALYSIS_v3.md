@@ -349,8 +349,9 @@ TODO
 ### MP3 
 | Address | Size | Label | 
 |-|-|-|
-| 0x900800d2 | 0x0C60 (3168) | [Howl](dump/mp3/howl.mp3) |
-| 0x9007efa6 | 0x1128 (4392) | [Birds](dump/mp3/birds.mp3) |
+| 0x900800d2 | 0x0C60 (3168) | [Howl](dump/_v2/mp3/howl.mp3) |
+| 0x9007efa6 | 0x1128 (4392) | [Birds](dump/_v2/mp3/birds.mp3) |
+| 0x9004ca40 | 0x1147D (70781) | [Pairing](dump/_v3/res/MP3_PAIR.mp3) |
 
 ## SD structure & Files 
 NOTE : **Ciphered files are only protected on first 0x200 block !**

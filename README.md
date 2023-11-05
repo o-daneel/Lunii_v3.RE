@@ -33,10 +33,10 @@ Work in progress to extract the root key that seems to be the **device key**.
 ## Reverse state  
 | Category | count |
 | - | -: |
-| Total Symbols (fn + data) | `2322` |
-| No yet identified | `886` |
+| Total Symbols (fn + data) | `2344` |
+| No yet identified | `831` |
 
-**61%** reversed and decompiled
+**65%** reversed and decompiled
 
 
 # Work in Progress
