@@ -5,6 +5,9 @@
     - [🚧 Dump Analysis](#-dump-analysis)
     - [Flash content update](#flash-content-update)
     - [Known plain text attack](#known-plain-text-attack)
+- [Keys](#keys)
+  - [Generic](#generic)
+  - [Device](#device)
 
 
 # TL;DR
@@ -40,3 +43,25 @@
 ### Flash content update
 
 ### Known plain text attack
+
+# Keys
+
+Resources are deciphered through callbacks:
+* BMP : used with HAL_SCR_displayPicture_fromFile
+* MP3 : used in HAL_AUDIO_play, callback MP3_DEC_cb_read_plain
+
+## Generic
+Applies to all the devices
+
+Applies to:
+* Sync token
+* .md file
+* bitmaps
+* mp3s
+
+Functions:
+* HAL_CRYP_KeyDev_Decrypt
+* HAL_CRYP_KeyDev_Encrypt
+  
+## Device
+Applies to a specific device

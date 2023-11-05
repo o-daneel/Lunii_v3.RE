@@ -8,7 +8,7 @@ Even if you don't, children will 😁**
 
 * Lunii v2
    1. [Hardware](HARDWARE_v2.md)
-   2. [Firmware analysis](ANALYSIS.md)
+   2. [Firmware analysis](ANALYSIS_v2.md)
    3. [Ciphering reverse](CIPHERING_v2.md)
 * Lunii v3
    1. [Hardware](HARDWARE_v3.md)
@@ -16,7 +16,7 @@ Even if you don't, children will 😁**
    3. [Ciphering reverse](CIPHERING_v3.md)
 
 
-# TL;DR
+# TL;DR v2
 Too long, didn't read ?    
 Many people doesn't care about about software security. There Lunii's company failed in many ways:
 1. JTAG is still enabled on the PCB (allows internal flash dump)
@@ -24,6 +24,11 @@ Many people doesn't care about about software security. There Lunii's company fa
 3. UART is enabled, then provides a lot of debug
 4. Firmware embeds too many debug strings helping decompiling
 5. Firmwares are verified/validated through a dumb CRC (Hash would have been better)
+
+# TL;DR v3
+Too long, didn't read ?    
+They learnt from previous section ! 😅
+Work in progress to extract the root key that seems to be the **device key**.
 
 # Work in Progress
 

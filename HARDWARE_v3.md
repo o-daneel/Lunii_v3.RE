@@ -18,7 +18,7 @@ To be checked
 * Voltage Regulator : AP7362 (DIODES) 4.2v -> 3.3v
 * Battery Management System (BMS) :  
   * MCP73833
-  * 
+  * BQ25170
 * SD 16GB (SDIO interface)
 * ST25DV04K (I2C interface)
   * [Datasheet](docs/st25dv04k.pdf)
@@ -30,9 +30,9 @@ To be checked
 ## Peripherals Mapping
 | Peripheral | GPIOx | mask |
 |-|-|-|
-| Button 1 | GPIO **A** | `0x00000004` |
-| Button 2 | GPIO **C** | `0x00000002` |
-| Button 3 | GPIO **C** | `0x00002000` |
+| Button 1 - HOME | GPIO **A** | `0x00000004` |
+| Button 2 - PAUSE | GPIO **C** | `0x00000002` |
+| Button 3 - OK | GPIO **C** | `0x00002000` |
 | Rotary Wheel U | GPIO **D** | `0x00000800` |
 | Rotary Wheel D | GPIO **D** | `0x00002000` |
 | Rotary Wheel L | GPIO **D** | `0x00000400` |

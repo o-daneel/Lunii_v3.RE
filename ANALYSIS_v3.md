@@ -471,8 +471,8 @@ Structure:
 0600 (Static)
 332E312E3200000000000000000000000000000000000000 : Software version (24 Bytes)
                                                    > 3.1.2 
-32303132313131313232333334340000000000000000 : SNU - Storyteller Unique ID  (18 Bytes)
-                                               > 20121111223344 
+323031323131313132323333343400000000000000000000 : SNU - Storyteller Unique ID  (24 Bytes)
+                                                   > 20121111223344 
 0000830441A30000 (Static)
 00000001 : Hardware version major
 00000010 : Hardware version minor
@@ -487,7 +487,11 @@ v2 :
     31333934XXYYZZ 0700 2600 3EF0112233 : 7Bytes of Unique Dev ID + 2 WORDS + 5 static Bytes
     0000XXYY 60 times (0xF0) : TBD
 v3 :
-    ??
+    SNU copied twice and ciphered
+    323031323131313132323333343400000000000000000000 : SNU - Storyteller Unique ID  (24 Bytes)
+                                                       > 20121111223344 
+    323031323131313132323333343400000000000000000000 : SNU - Storyteller Unique ID  (24 Bytes)
+                                                       > 20121111223344 
 ```
 ### .pi
 * **Length** : variable
