@@ -13,6 +13,20 @@ typedef unsigned int    undefined4;
 typedef unsigned long long    undefined8;
 typedef unsigned short    ushort;
 
+
+
+typedef enum FATFS_OPEN_MODE { /* File access mode and open method flags (3rd argument of f_open) */
+    FA_OPEN_EXISTING=0,
+    FA_READ=1,
+    FA_WRITE=2,
+    FA_CREATE_NEW=4,
+    FA_CREATE_ALWAYS=8,
+    FA_OPEN_ALWAYS=16,
+    FA_OPEN_APPEND=48
+} FATFS_OPEN_MODE;
+
+#include "ff.h"
+
 typedef enum ESP32_AP_ENC {
     OPEN=0,
     WPA_PSK=2,
@@ -49,16 +63,6 @@ typedef enum CRYPTO_MODE {
     KEY_GENERIC=1,
     KEY_NONE=2
 } CRYPTO_MODE;
-
-typedef enum FATFS_OPEN_MODE { /* File access mode and open method flags (3rd argument of f_open) */
-    FA_OPEN_EXISTING=0,
-    FA_READ=1,
-    FA_WRITE=2,
-    FA_CREATE_NEW=4,
-    FA_CREATE_ALWAYS=8,
-    FA_OPEN_ALWAYS=16,
-    FA_OPEN_APPEND=48
-} FATFS_OPEN_MODE;
 
 typedef enum msg_level { /* Level to use for printf_level */
     LVL_ERROR=0,
@@ -103,6 +107,25 @@ struct RTOS_Task {
     byte * buffer1;
     byte * buffer2;
 };
+
+struct sync_ff_callback {
+    FRESULT (*cb_read)( FIL **fp,void *buff,uint btr );
+    BYTE (*cb_seek)( FIL **fp,FSIZE_t ofs );
+    uint (*cb_close)( FIL **fp );
+    FIL * fp;
+    uint fp_pos;
+    BYTE * dummy1;
+    BYTE * dummy2;
+};
+
+struct wifi_entry {
+    BYTE used;
+    char SSID[0x21];
+    char BSSID[0x12];
+    char PWD[0x40];
+};
+#define MAX_WIFI_ENTRIES    10
+#define WIFI_ENTRY_SIZE     0x74
 
 typedef struct VectorTable VectorTable, *PVectorTable;
 

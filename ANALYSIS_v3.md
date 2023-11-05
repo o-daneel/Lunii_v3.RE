@@ -1,11 +1,11 @@
 # Summary
 - [Summary](#summary)
 - [Memory layout](#memory-layout)
-  - [Bootloader Firmware v2 (TBC)](#bootloader-firmware-v2-tbc)
+  - [Bootloader Firmware v3 (TBC)](#bootloader-firmware-v3-tbc)
   - [Main Firmware](#main-firmware)
     - [Mapping](#mapping)
   - [Backup Firmware](#backup-firmware)
-  - [SNU location (TBC)](#snu-location-tbc)
+  - [SNU location ()](#snu-location-)
 - [Test Mode](#test-mode)
   - [How to enable ?](#how-to-enable-)
   - [Behavior](#behavior)
@@ -18,9 +18,9 @@
   - [Ghidra Project](#ghidra-project)
     - [How to import](#how-to-import)
   - [Thoughts](#thoughts)
-    - [Firmware CRC](#firmware-crc)
+    - [Firmware Hash](#firmware-hash)
     - [Custom firmware](#custom-firmware)
-      - [Boot procedure](#boot-procedure)
+      - [Boot procedure (TBC)](#boot-procedure-tbc)
     - [NFC chip](#nfc-chip)
     - [Finding SD Ciphering](#finding-sd-ciphering)
 - [Crypt-Analysis](#crypt-analysis)
@@ -35,13 +35,12 @@
     - [Audio : MP3](#audio--mp3)
     - [Indexes](#indexes)
   - [Files Format](#files-format)
-    - [.bgt](#bgt)
     - [version](#version)
-    - [/cmd](#cmd)
-    - [/wifi.prefs](#wifiprefs)
-    - [.pi](#pi)
+    - [cmd](#cmd)
+    - [wifi.prefs](#wifiprefs)
+    - [.bgt](#bgt)
     - [.md](#md)
-    - [.pi](#pi-1)
+    - [.pi](#pi)
     - [.cfg](#cfg)
     - [.nm](#nm)
     - [.content/XXXXYYYY](#contentxxxxyyyy)
@@ -74,7 +73,7 @@ Three of them are of interest:
       From flash segment `0x9009071C`
 
 
-## Bootloader Firmware v2 (TBC)
+## Bootloader Firmware v3 (TBC)
 
 1. Initialize many peripheral (FPU, RCC, GPIOF/C/A/D, ADC3, UART4, CRC, QSPI)
 2. Check that batt level not critical (or abort)
@@ -83,21 +82,26 @@ Three of them are of interest:
    2. preapre SDMMC2
    3. mount sdcard
    4. Try to open `fa.bin`
-   5. if exists, read crc and check update crc
-   6. if CRC ok : erase sectors and write main firmware
-   7. Close, remove update file, umount SD
-4. Read main FW CRC and check it
+   5. if exists
+      1. decipher the binary
+      2. compute Hash and check
+      3. if hash ok : erase sectors and write main firmware
+      4. close, remove update file, umount SD
+4. Read main FW Hash and check it
 5. if failed, backup FW
-   1. Read backup FW CRC and check it
-   2. if CRC ok : erase sectors and write backup firmware to main 
+   1. Read backup FW Hash and check it
+   2. if Hash ok : erase sectors and write backup firmware to main 
    3. if any error, dead loop
-7. Init QPSI (if not done yet)
-8. Switch to main FW
+6. Init QPSI (if not done yet)
+7. Switch to main FW
 
 This FW contains FatFs (different config) for SD access and performs read/write to QSPI flash though commands   
 It also contains storyteller identification data :
-* `0x0800C000_0x0800C007` - SNU  
-* `0x0800C008_0x0800C088` - Extra data ciphered ? (including second Key)  
+* `0x0800BE00_0x0800BE0F` - AES DEVICE KEY  
+* `0x0800BE10_0x0800BE1F` - AES DEVICE IV  
+* `0x0800BE20_0x0800BE37` - SNU  
+* `0x0800BE48_0x0800BE57` - Wifi SSID  
+* `0x0800BE58_0x0800BE67` - Wifi Password
 
 
 ## Main Firmware
@@ -117,10 +121,8 @@ A short mini firmware ! might be located at `0x90100000`
 **Objective :** make sure that an USB mass storage is accessible for MainFW reload   
 **Note :** This firmware in not expected to be updated, nor updatable
 
-## SNU location (TBC)
-8 bytes for SNU located at : `0x0800BE98` (internal flash)   
-All around .md file that is recreated if not there.
-How and when is it inserted into bootloader firmware ?   
+## SNU location ()
+8 bytes for SNU located at : `0x0800BE20` (internal flash)   
 
 # Test Mode
 
@@ -138,7 +140,7 @@ lunii_shell	90013d50	Function	Global	User Defined	1	0
 This function compares text read (from UART ? TBC), against a table of handlers.
 
 ### Handlers
-The handlers are located at `90036854  CMD_LIST[0x18]`
+The handlers are located at `9006b7c8  CMD_LIST[0x1C]`
 
 Each CMD_LIST is made of :
 * `char * COMMAND`
@@ -173,11 +175,11 @@ Each CMD_LIST is made of :
 
 # Wifi
 ## Commands
-FACTORY_RESET
-REMOVE_WIFI
-LIST_WIFI
-ADD_WIFI
-LINK_FAH
+FACTORY_RESET  
+REMOVE_WIFI  
+LIST_WIFI  
+ADD_WIFI  
+LINK_FAH  
 
 # Security study
 
@@ -203,7 +205,8 @@ Thanks to the following tools:
 
 ## Thoughts
 
-### Firmware CRC
+### Firmware Hash
+Should be a SHA256  
 refer to [MainFW Mapping](#mapping)
 
 ### Custom firmware
@@ -215,15 +218,13 @@ Firmware archive seems to be named as :
 `boot.bin @08006294 : fa.bin`   
 Firmware update seems to be a simple file starting from vectors, ending after expected CRC
 
-#### Boot procedure
+#### Boot procedure (TBC)
 1. check for USB power source connected   
    Otherwise upgrade process is skipped
 2. Looks for `fa.bin` file
-3. Check internal CRC
+3. Check internal Hash
 4. Write to Main FW memory segment
 5. jump to Main FW
-
-You can retrieve this execution flow in ghidra here :   `boot.bin @08005f04`   
 
 
 ### NFC chip
@@ -348,10 +349,8 @@ TODO
 ### MP3 
 | Address | Size | Label | 
 |-|-|-|
-| 0x9002aba2 | 0x0C60 (3168) | [Howl](dump/mp3/howl.mp3) |
-| 0x90029a76 | 0x1128 (4392) | [Birds](dump/mp3/birds.mp3) |
-| 0x9002bdf8 | 0x5028 (20520) | [BEEP_1KHz](dump/mp3/beep_1khz.mp3) |
-| 0x900313e4 | 0x55ec (21996) | [BEEP_10KHz](dump/mp3/beep_10khz.mp3) |
+| 0x900800d2 | 0x0C60 (3168) | [Howl](dump/mp3/howl.mp3) |
+| 0x9007efa6 | 0x1128 (4392) | [Birds](dump/mp3/birds.mp3) |
 
 ## SD structure & Files 
 NOTE : **Ciphered files are only protected on first 0x200 block !**
@@ -438,14 +437,6 @@ Indexes files :
 4) **si** : [Story index](#contentxxxxyyyysi)
 
 ## Files Format
-### .bgt
-* **Length** : 0x01
-* **Key** : None
-
-
-This is a config file to store brightness level. Fixed size of 1 Byte, no ciphering applied on it.  
-The brightness must be in range `0-100`
-
 ### version
 * **Length** : 0x14 (20B)
 * **Key** : plain
@@ -455,10 +446,56 @@ This is a config file to store a date to define SDcard version. Fixed size of 20
 2023-06-14 14:51 UTC
 ``` 
 
-### /cmd
-### /wifi.prefs
-### .pi
+### cmd
+* **Length** : variable
+* **Key** : device
+This file seems to be a script file to store personnalization step to perform on Lunii.
 
+| Location | Command | Comments |
+| - | -: | - |
+| `0x9005E521`	| MSC_CMD_SET_ONBOARDING | - |
+| `0x9005E53D`	| MSC_CMD_RESET_ONBOARDING | - |
+| `0x9005E55B`	| MSC_CMD_CREATE | - |
+| `0x9005E56F`	| MSC_CMD_DELETE | - |
+| `0x9005E583`	| MSC_CMD_COPY | - |
+| `0x9005E595`	| MSC_CMD_MOVE | - |
+| `0x9005E5A7`	| MSC_CMD_REBOOT | - |
+| `0x9005E5ED`	| MSC_CMD_END | - |
+
+### wifi.prefs
+* **Length** : 0x74 * 0xA = 0x488 (1160B)
+* **Key** : device (fully ciphered)
+
+This file has the following structure:
+
+``` C
+struct wifi_entry {
+    BYTE used;
+    char SSID[0x21];
+    char BSSID[0x12];
+    char PWD[0x40];
+};
+
+#define MAX_WIFI_ENTRIES    10
+#define WIFI_ENTRY_SIZE     0x74
+
+struct wifi_entry WIFI_CONF[WIFI_ENTRY_SIZE];
+```
+
+Symboles using 
+* CONFIG_LOAD_wifi.prefs
+* WIFI_CONF 
+* WIFI_addNetConf
+* WIFI_getNetConf
+* WIFI_udpateNetPwd
+
+### .bgt
+* **Length** : 0x01
+* **Key** : None
+
+
+This is a config file to store brightness level. Fixed size of 1 Byte, no ciphering applied on it.  
+The brightness must be in range `0-100`
 
 ### .md
 * **Length** : 0x70 (112B)
