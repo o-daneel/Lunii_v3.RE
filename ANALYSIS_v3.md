@@ -75,6 +75,27 @@ Three of them are of interest:
 
 ## Bootloader Firmware v3 (TBC)
 
+Console is still available on USART4 (PA0/1)
+
+    (22:57:56.490) [BOOTLOADER]Bootloader v3.0
+    (22:57:56.515) [BOOTLOADER]GPIO init
+    (22:57:56.515) [BOOTLOADER]DMA init
+    (22:57:56.515) [BOOTLOADER]ADC3 init
+    (22:57:56.515) [BOOTLOADER]SDMMC2 init
+    (22:57:56.515) [BOOTLOADER]QUADSPI init
+    (22:57:56.515) [BOOTLOADER]Battery level: 3634
+    (22:57:56.525) [BOOTLOADER]check_STOP...
+    (22:57:56.525) [BOOTLOADER]Check for firmware update file
+    (22:57:56.530) [BOOTLOADER]SDMMC2 init
+    (22:57:56.540) [BOOTLOADER]FATFS init
+    (22:57:56.540) [BOOTLOADER]FATFS mounted
+    (22:57:56.540) [BOOTLOADER]found fa.bin: 611328 bytes
+    (22:57:59.526) [BOOTLOADER]Unmount FATFS
+    (22:57:59.535) [BOOTLOADER]Unmount result: 0
+    (22:58:01.270) [BOOTLOADER]Start Lunii firmware...
+
+  
+Bootloader process as following:
 1. Initialize many peripheral (FPU, RCC, GPIOF/C/A/D, ADC3, UART4, CRC, QSPI)
 2. Check that batt level not critical (or abort)
 3. Check for Firmware update

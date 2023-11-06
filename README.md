@@ -30,13 +30,21 @@ Too long, didn't read ?
 They learnt from previous section ! 😅
 Work in progress to extract the root key that seems to be the **device key**.
 
-## Reverse state  
-| Category | count |
+## Reverse state 📈  
+
+| Code size | in KB |
+| - | -: |
+| Total FW size  | `582` |
+| Identified symbols | `431` |
+|  |  |
+> **74%** of firmware reversed and decompiled
+
+| Symbols | count |
 | - | -: |
 | Total Symbols (fn + data) | `2344` |
 | No yet identified | `831` |
-
-**65%** reversed and decompiled
+|  |  |
+> **65%** of Symbols reversed and decompiled
 
 
 # Work in Progress
