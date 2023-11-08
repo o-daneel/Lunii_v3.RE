@@ -75,7 +75,7 @@ Three of them are of interest:
 
 ## Bootloader Firmware v3 (TBC)
 
-Console is still available on USART4 (PA0/1)
+Console is still available on USART4 (PA0/1), on J3 Pin Header
 
     (22:57:56.490) [BOOTLOADER]Bootloader v3.0
     (22:57:56.515) [BOOTLOADER]GPIO init
@@ -167,40 +167,47 @@ Each CMD_LIST is made of :
 * `char * COMMAND`
 * `void (* fn)(void)`
 
-9003684c
+
 ### List
-- SOFTWARE_VERSION
-- HARDWARE_VERSION
-- VBAT?
-- NFC_READ?
-- NFC_WRITE
-- NFC_UUID?
-- MCU_UUID?
-- BOUTONS_POUSSOIR
-- BOUTON_SELECTION
-- ECRAN_LOGO
-- ECRAN_DAMIER
-- ECRAN_DAMIER_IN
-- ECRAN_OFF
-- WHITE_SCREEN
-- SDCARD_MOUNTED?
-- WRITE_KEY_UUID
-- REBOOT
-- AUDIO_JACK
-- AUDIO_SPEAKER
-- AUDIO_OFF
-- JACK_PRESENCE?
-- AUTOTEST?
-- SDCARD_CHECKSUM
-- SDCARD_VERSION
+- CMD_audio_jack
+- CMD_audio_off
+- CMD_audio_speaker
+- CMD_autotest
+- CMD_buttons
+- CMD_disp_backlight
+- CMD_disp_backlight_apply
+- CMD_disp_black
+- CMD_disp_mire
+- CMD_display_black
+- CMD_display_white
+- CMD_hardware_version
+- CMD_jack_presence
+- CMD_mcu_uuid
+- CMD_nfc_read
+- CMD_nfc_uuid
+- CMD_nfc_write
+- CMD_onboarding_state
+- CMD_reboot
+- CMD_sdcard_checksum
+- CMD_sdcard_mounted
+- CMD_sdcard_version
+- CMD_set_rdp
+- CMD_software_version
+- CMD_vbat
+- CMD_wheel
+- CMD_wifi
+- CMD_write_metadata
 
 # Wifi
+Those commands are to be sent on **lunii** hotspot, on server **192.168.4.1:3334**
+
 ## Commands
-FACTORY_RESET  
-REMOVE_WIFI  
-LIST_WIFI  
-ADD_WIFI  
-LINK_FAH  
+- ADD_WIFI  
+- FACTORY_RESET  
+- LINK_FAH  
+- LIST_WIFI  
+- REMOVE_WIFI  
+- SCAN_WIFI
 
 # Security study
 
