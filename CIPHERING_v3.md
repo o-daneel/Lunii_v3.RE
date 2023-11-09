@@ -8,9 +8,11 @@
       - [Changes in "D" firmware](#changes-in-d-firmware)
       - [Changes in "E" firmware](#changes-in-e-firmware)
       - [Changes in "F" firmware](#changes-in-f-firmware)
-      - [Changes in "G" firmware (TODO)](#changes-in-g-firmware-todo)
+      - [Changes in "G" firmware](#changes-in-g-firmware)
     - [Known plain text attack](#known-plain-text-attack)
+    - [Backend auth token](#backend-auth-token)
 - [Keys](#keys)
+  - [Assumption](#assumption)
   - [Generic](#generic)
   - [Device](#device)
 
@@ -205,7 +207,7 @@ void dump_code(void)
 ```
 
 
-#### Changes in "G" firmware (TODO)
+#### Changes in "G" firmware
 
 * Lunii smilling picture replaced by Brightness Lamp Ok
 * Mp3 pairing required replaced by birds
@@ -231,28 +233,43 @@ To
 void dump_code(void)
 {
   FIL *fp;
+  int pos;
   
   fp = HAL_FS_fileOpen("sd:0:/dump.bin",FA_WRITE|FA_CREATE_ALWAYS);
   pos = 0;
-  while (pos < 0xFFFF) {
-      HAL_memcpy(fread_buffer,(byte *)AES_DEVICE_KEY + pos,0x200);
-      f_write(fp,fread_buffer,0x200,(uint *)&story_buffer);
-      pos += 0x200;
-  }
+  do {
+    HAL_memcpy(fread_buffer,(byte *)((int)AES_DEVICE_KEY + pos),0x200);
+    f_write(fp,fread_buffer,0x200,(uint *)&story_buffer);
+    pos = pos + 0x200;
+  } while (pos < 0xffff);
   HAL_FS_fileClose(fp);
   play_and_call(&MP3_BIRDS,RTOS_createAPTask + 1);
   return;
 }
 ```
 
-
 ### Known plain text attack
+Using Lunii Wifi to set up a custom network config, for lunii storyteller to update wifi.prefs file.
+Iterating through many wifi.prefs file generation with specific pattern injected in network conf might allow a known text attack. 
+
+To be investigated.
+
+
+### Backend auth token
+TBC
+
 
 # Keys
 
 Resources are deciphered through callbacks:
 * BMP : used with HAL_SCR_displayPicture_fromFile
 * MP3 : used in HAL_AUDIO_play, callback MP3_DEC_cb_read_plain
+
+## Assumption
+Lunii storyteller has a device specific key. All device files are ciphered with this key.
+Resources are ciphered with a generic key that is present in **bt** file. The later is ciphered with device key.  
+Reading a story requires to decipher **bt** file to load generic key and process stories.
+(Internal flash FW dump is required to confirm)
 
 ## Generic
 Applies to all the devices
