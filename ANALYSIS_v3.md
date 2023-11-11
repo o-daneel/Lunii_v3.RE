@@ -1,9 +1,11 @@
 # Summary
 - [Summary](#summary)
-- [Memory layout](#memory-layout)
+- [Firmwares](#firmwares)
+  - [Memory layout](#memory-layout)
   - [Bootloader Firmware v3 (TBC)](#bootloader-firmware-v3-tbc)
   - [Main Firmware](#main-firmware)
     - [Mapping](#mapping)
+    - [Modules dependencies](#modules-dependencies)
   - [Backup Firmware](#backup-firmware)
   - [SNU location ()](#snu-location-)
 - [Test Mode](#test-mode)
@@ -14,6 +16,14 @@
     - [List](#list)
 - [Wifi](#wifi)
   - [Commands](#commands)
+- [Backend](#backend)
+  - [Functions](#functions)
+  - [Endpoints](#endpoints)
+    - [Sign In](#sign-in)
+    - [Sign Out](#sign-out)
+    - [Audio Books](#audio-books)
+- [Onboarding](#onboarding)
+  - [Process](#process)
 - [Security study](#security-study)
   - [Ghidra Project](#ghidra-project)
     - [How to import](#how-to-import)
@@ -57,7 +67,8 @@
 - [Links](#links)
 
 
-# Memory layout
+# Firmwares
+##  Memory layout
 <img src="resources/mem_map.png" width="400">
 
 Three of them are of interest:
@@ -136,6 +147,13 @@ Few interesting offsets :
 * `0x90000000` - 0x1E0 Bytes : VectorTable
 * `0x90000400` - 4 Bytes : Pointer to firmware End (previously pointer to CRC)
 
+### Modules dependencies
+| Module Name | Git URL |
+|-|-|
+| FreeRTOS | https://github.com/STMicroelectronics/STM32CubeF7.git |
+| FatFS | From FreeRTOS (ThridParty/Middleware) |
+| coreJSON | https://github.com/FreeRTOS/coreJSON.git |
+
 ## Backup Firmware
 A short mini firmware ! might be located at `0x90100000`   
 **Version :** 3.1.2   
@@ -208,6 +226,46 @@ Those commands are to be sent on **lunii** hotspot, on server **192.168.4.1:3334
 - LIST_WIFI  
 - REMOVE_WIFI  
 - SCAN_WIFI
+
+# Backend
+## Functions
+    backend_authtoken_ready
+    backend_pairing_device
+    backend_signin
+    backend_signout
+    backend_synchro
+    backend_synchronisation_request
+    backend_upload_progress
+
+## Endpoints
+    server-backend-prod.lunii.com/devices
+    server-backend-prod.lunii.com/devices/%s/signin
+    server-backend-prod.lunii.com/devices/%s/signout
+    server-backend-prod.lunii.com/devices/%s/audiobooks/
+    server-backend-prod.lunii.com/devices/%s/audiobooks/%s
+
+### Sign In 
+    curl -x socks5://localhost:9050 \
+      --header "Content-Type: application/json" \
+      --header "User-Agent: FaHv3"\
+      --request POST \
+      --data '{"vendorId": "0x0483", "productId": "0xa341", "firmwareVersion": "3.1.2", "sdCardSize": 1024, "sdCardFree": 1000, "sdCardUsed": 24,"batteryLevel": 95, "batteryCharging": false, "wifiLevel": 5, "wifiSsid": "LUNII_AP"}' \
+      https://server-backend-prod.lunii.com/devices/23023030012345/signin
+
+    {"challenge":"oMjxuoautvnhMYbJDMcPx2nMmO7T1YRMPP_s9kOxf4w","isUpdateAvailable":false}
+    # b64 : oMjxuoautvnhMYbJDMcPx2nMmO7T1YRMPP_s9kOxf4w
+    # hex : A0C8F1BA86AEB6F9E13186C90CC70FC769CC98EED3D5844C3CFB3D90EC5FE3
+    # txt : lunii: ???????
+
+### Sign Out
+TBF 
+
+### Audio Books
+TBF
+
+# Onboarding
+
+## Process
 
 # Security study
 

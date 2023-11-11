@@ -127,6 +127,19 @@ struct wifi_entry {
 #define MAX_WIFI_ENTRIES    10
 #define WIFI_ENTRY_SIZE     0x74
 
+struct lunii_info {
+    char * vendorID;
+    char * productID;
+    char * fwVersion;
+    uint sdCardSize;
+    uint sdCardFree;
+    uint sdCardUsed;
+    short batteryLevel;
+    short batteryCharging;
+    uint wifiLevel;
+    char * wifiSSID;
+};
+
 typedef struct VectorTable VectorTable, *PVectorTable;
 
 struct VectorTable { /* Interrupt and exception vectors */

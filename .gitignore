@@ -1,5 +1,6 @@
 **/.idea
 **/.vscode
+ghidra/*Apk*
 ghidra/Lunii*.rep
 ghidra/Lunii*.gpr
 ghidra/Lunii*.lock*
@@ -16,5 +17,6 @@ tools/lunii-qt
 tools/lunii-cli
 tools/SVD*
 tools/STM*
+tools/coreJSON*
 tools/studio*
 tools/venv*

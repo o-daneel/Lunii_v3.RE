@@ -35,31 +35,39 @@ Work in progress to extract the root key that seems to be the **device key**.
 | Code size | in KB |
 | - | -: |
 | Total FW size  | `582` |
-| Identified symbols | `431` |
+| Identified symbols | `484` |
 |  |  |
-> **74%** of firmware reversed and decompiled
+> **83%** of firmware reversed and decompiled
 
 | Symbols | count |
 | - | -: |
-| Total Symbols (fn + data) | `2344` |
-| No yet identified | `831` |
+| Total Symbols (fn + data) | `2355` |
+| No yet identified | `761` |
 |  |  |
-> **65%** of Symbols reversed and decompiled
-
+> **67%** of Symbols reversed and decompiled
 
 # Work in Progress
 
 ### TODO v3
-* Ghidra on FW dump
-  * update HW section based on FW
-  * import symbols from v2 : WIP
-  * identify update decipher
-  * identify header decipher
-  * locate AES Key
-    * STM32 AES sample code usage (for structs)
-    * review Lunii AES usage
-* AES crypto : **confirmed**
+* Ghidra
+  * on bootloader FW (expecting dump WIP)
+    * update process
+    * hash verification
+  * on mainFW
+    * ~~update HW section based on FW~~
+    * ~~import symbols from v2 : WIP~~
+    * ~~identify update decipher~~
+    * ~~identify header decipher~~
+    * ~~locate AES Key~~
+      * STM32 AES sample code usage (for structs)
+      * review Lunii AES usage
+    * ~~Review FreeRTOS usage~~
+    * ~~Review FatFS~~
+    * ~~Review story management~~
+    * ~~Review Backend process~~
+    * Review Onboarding
 * check XXTEA on new v3 files : **FAILED**
+* AES crypto : **confirmed**
 
 ### TODO v2
 * Describe test mode / Try it
