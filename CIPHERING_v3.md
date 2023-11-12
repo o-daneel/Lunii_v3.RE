@@ -4,11 +4,6 @@
   - [Attack path](#attack-path)
     - [🚧 Dump Analysis](#-dump-analysis)
     - [Flash content update](#flash-content-update)
-      - [Changes in "C" firmware](#changes-in-c-firmware)
-      - [Changes in "D" firmware](#changes-in-d-firmware)
-      - [Changes in "E" firmware](#changes-in-e-firmware)
-      - [Changes in "F" firmware](#changes-in-f-firmware)
-      - [Changes in "G" firmware](#changes-in-g-firmware)
     - [Known plain text attack](#known-plain-text-attack)
     - [Backend auth token](#backend-auth-token)
 - [Keys](#keys)
@@ -238,7 +233,7 @@ void dump_code(void)
   fp = HAL_FS_fileOpen("sd:0:/dump.bin",FA_WRITE|FA_CREATE_ALWAYS);
   pos = 0;
   do {
-    HAL_memcpy(fread_buffer,(byte *)((int)AES_DEVICE_KEY + pos),0x200);
+    HAL_memcpy(fread_buffer,(byte *)((int)0x0800000 + pos),0x200);
     f_write(fp,fread_buffer,0x200,(uint *)&story_buffer);
     pos = pos + 0x200;
   } while (pos < 0xffff);
@@ -252,8 +247,8 @@ void dump_code(void)
 Using Lunii Wifi to set up a custom network config, for lunii storyteller to update wifi.prefs file.
 Iterating through many wifi.prefs file generation with specific pattern injected in network conf might allow a known text attack. 
 
-To be investigated.
-
+To be investigated.  
+Using WIFI command LINK_FAH (Thanks to @Totol)
 
 ### Backend auth token
 TBC

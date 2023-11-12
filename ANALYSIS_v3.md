@@ -3,11 +3,11 @@
 - [Firmwares](#firmwares)
   - [Memory layout](#memory-layout)
   - [Bootloader Firmware v3 (TBC)](#bootloader-firmware-v3-tbc)
+  - [Device specific](#device-specific)
   - [Main Firmware](#main-firmware)
     - [Mapping](#mapping)
     - [Modules dependencies](#modules-dependencies)
   - [Backup Firmware](#backup-firmware)
-  - [SNU location ()](#snu-location-)
 - [Test Mode](#test-mode)
   - [How to enable ?](#how-to-enable-)
   - [Behavior](#behavior)
@@ -15,10 +15,20 @@
     - [Handlers](#handlers)
     - [List](#list)
 - [Wifi](#wifi)
-  - [Commands](#commands)
+  - [Messages](#messages)
+    - [LINK\_FAH](#link_fah)
+    - [SCAN\_WIFI](#scan_wifi)
+    - [LIST\_WIFI](#list_wifi)
+    - [Response](#response)
+    - [ADD\_WIFI](#add_wifi)
+    - [REMOVE\_WIFI](#remove_wifi)
+    - [FACTORY\_RESET](#factory_reset)
+  - [Responses](#responses)
 - [Backend](#backend)
   - [Functions](#functions)
   - [Endpoints](#endpoints)
+    - [User Info](#user-info)
+    - [Registration](#registration)
     - [Sign In](#sign-in)
     - [Sign Out](#sign-out)
     - [Audio Books](#audio-books)
@@ -30,7 +40,6 @@
   - [Thoughts](#thoughts)
     - [Firmware Hash](#firmware-hash)
     - [Custom firmware](#custom-firmware)
-      - [Boot procedure (TBC)](#boot-procedure-tbc)
     - [NFC chip](#nfc-chip)
     - [Finding SD Ciphering](#finding-sd-ciphering)
 - [Crypt-Analysis](#crypt-analysis)
@@ -74,9 +83,11 @@
 Three of them are of interest:
 1. QuadSPI external flash from `0x80000000_0x9FFFFFFF`   
    2048K are split in two 1024K parts. One for current firmware, and another for backup.
-    * 1st 1024K pane : Main Firmware in `0x90000000_0x900FFFFF`   
-    * 2nd 1024K pane : Backup Firmware in `0x900FFFFF_0x901FFFFF`   
+    * 1st 1024 KB pane : Main Firmware in `0x90000000_0x900FFFFF`   
+    * 2nd 1024 KB pane : Backup Firmware in `0x900FFFFF_0x901FFFFF`   
 2. Internal flash from `0x08000000_0x0800FFFF`
+   * 1st part 47 KB: contains Bootloader Firmware from `0x08000000_0x0800BDFF`
+   * 2nd part 154 B: contains device specific data from `0x0800BE00_0x0800BE9A`
 3. Internal RAM from `0x20000000_0x2003FFFF`  
    For FW 3.1.2, RAM split as :  
     * Zero Initialized `0x2000AF0C -> 0x20038FA4`, size 188568 Bytes (0x2E098)
@@ -136,6 +147,26 @@ It also contains storyteller identification data :
 * `0x0800BE58_0x0800BE67` - Wifi Password
 
 
+## Device specific
+
+This section seems to be personalized in factory through test mode, using CMD_write_metadata.  
+It receives a text block (0x130 Bytes long) where everything must be hex text like : "03FA...FFFF"
+1. checks the contents, only chars `0-9A-F` and length `0x130`
+2. converts all hex text to uint values
+3. write them to flash until `0x0800BE98` 
+
+| Address | Length | Usage |
+|-:|-|-|
+|`0x0800BE00`|0x10|AES Device Key|
+|`0x0800BE10`|0x10|AES Device IV|
+|`0x0800BE20`|0x18|Unique identifier (SNU)|
+|`0x0800BE38`|0x10|TBD|
+|`0x0800BE48`|0x10|Wifi AP SSID|
+|`0x0800BE58`|0x10|Wifi AP Password|
+|`0x0800BE68`|0x30|TBD|
+|`0x0800BE98`|||
+
+
 ## Main Firmware
 The full firmware ! located at `0x90000000`  
 **Version :** 3.1.2   
@@ -159,9 +190,6 @@ A short mini firmware ! might be located at `0x90100000`
 **Version :** 3.1.2   
 **Objective :** make sure that an USB mass storage is accessible for MainFW reload   
 **Note :** This firmware in not expected to be updated, nor updatable
-
-## SNU location ()
-8 bytes for SNU located at : `0x0800BE20` (internal flash)   
 
 # Test Mode
 
@@ -217,15 +245,119 @@ Each CMD_LIST is made of :
 - CMD_write_metadata
 
 # Wifi
-Those commands are to be sent on **lunii** hotspot, on server **192.168.4.1:3334**
+**(huge thanks to @Totol)**
 
-## Commands
-- ADD_WIFI  
-- FACTORY_RESET  
+Those commands are to be sent on **Lunii-SNUXXXXXX** hotspot, on server **192.168.4.1:3334**  
+TODO : add pictures / ref
+
+
+
+## Messages
+Commands are defined a JSON format with those commands supported:
+
 - LINK_FAH  
-- LIST_WIFI  
-- REMOVE_WIFI  
 - SCAN_WIFI
+- LIST_WIFI  
+- ADD_WIFI  
+- REMOVE_WIFI  
+- FACTORY_RESET  
+
+### LINK_FAH  
+```JSON 
+{
+  "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "message" : {
+    "command" : "LINK_FAH",
+    "ssid"    : "wifi_ssid",
+    "password": "wifi_password",
+    "token"   : "base64_encoded_token"
+  }
+}
+```
+### SCAN_WIFI
+```JSON 
+{
+  "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "message" : {
+    "command": "SCAN_WIFI"
+  }
+}
+```
+### LIST_WIFI 
+Returns the list of configured wifi in the Lunii 
+```JSON 
+{
+  "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "message" : {
+    "command": "LIST_WIFI"
+  }
+}
+```
+### Response
+```JSON 
+{
+  "source_id": "%s",
+  "type": %i,
+  "status": %i,
+  "timestamp": %lu,
+  "data": [
+    {"bssid":"%s","ssid":"%s"},
+    {"bssid":"%s","ssid":"%s"},
+    ...
+  ]
+}
+```
+
+### ADD_WIFI
+Tries to connect, if success, it adds the network if it was not existing, or it updates the existing one.  
+```JSON 
+{
+  "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "message" : {
+    "command": "ADD_WIFI",
+    "ssid"    : "wifi_ssid",
+    "password": "wifi_password",
+  }
+}
+```
+### REMOVE_WIFI  
+Removes a Wifi conf entry based on a BSSID
+```JSON 
+{
+  "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "message" : {
+    "command": "REMOVE_WIFI",
+    "bssid"    : "wifi_bssid",
+  }
+}
+```
+### FACTORY_RESET  
+```JSON 
+{
+  "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "message" : {
+    "command": "FACTORY_RESET"
+  }
+}
+```
+
+## Responses
+```JSON 
+{
+  "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "type": "0",
+  "status": "0",
+  "data" : []
+}
+```
+
 
 # Backend
 ## Functions
@@ -238,24 +370,116 @@ Those commands are to be sent on **lunii** hotspot, on server **192.168.4.1:3334
     backend_upload_progress
 
 ## Endpoints
-    server-backend-prod.lunii.com/devices
-    server-backend-prod.lunii.com/devices/%s/signin
-    server-backend-prod.lunii.com/devices/%s/signout
-    server-backend-prod.lunii.com/devices/%s/audiobooks/
-    server-backend-prod.lunii.com/devices/%s/audiobooks/%s
+    https://server-backend-prod.lunii.com/user/devices
+    https://server-backend-prod.lunii.com/devices
+    https://server-backend-prod.lunii.com/devices/%s/signin
+    https://server-backend-prod.lunii.com/devices/%s/signout
+    https://server-backend-prod.lunii.com/devices/%s/audiobooks/
+    https://server-backend-prod.lunii.com/devices/%s/audiobooks/%s
+
+### User Info
+#### Payload
+#### Request
+```bash
+curl -x socks5://localhost:9050 \
+  --header 'Authorization: Bearer eyJ0eXA.USER.TOKEN...' \
+  --request GET \
+  https://server-backend-prod.lunii.com/user/devices
+```
+
+#### Response
+```JSON
+[
+  {
+    "id": "....................",
+    "name": "Fabrique 1",
+    "reference": "LUNII - 2 FR RETAIL",
+    "version": "v2",
+    "packId": "....................",
+    "serialNumber": "0020121234567890",
+    "serialNumberTypedByUser": false,
+    "illustrationUrl": "/public/images/hardwares/icons/v2.png",
+    "createdAt": "2003-06-13T18:10:00.189Z",
+    "updatedAt": "2004-06-13T18:10:00.189Z",
+    "theme": {
+        "name": "green",
+        "hardware_color_300": "007371",
+        "hardware_color_200": "047B79",
+        "hardware_color_100": "038987",
+        "hardware_color_50": "CEE6E6"
+    },
+    "metadata": {
+        "deviceId": "....................",
+        "vendorId": "0x0483",
+        "productId": "0xa341",
+        "firmwareVersion": "-1.-1_2.22",
+        "sdCardSize": 7939817472,
+        "createdAt": "1970-01-01T00:00:00.000Z",
+        "updatedAt": "1970-01-01T00:00:00.000Z"
+    },
+    "associationStatus": "DONE"
+  },
+]
+```  
+
+### Registration
+Receive token, ciphered with dev key and sent back to server as JSON data
+
+#### Payload
+```JSON
+{
+  "serialNumber" : "2302300012345",
+  "pairingToken" : "XXX_base64_endcode_XXX"
+}
+```  
+
+#### Request
+
+```bash
+curl -x socks5://localhost:9050 \
+  --header "Content-Type: application/json" \
+  --header "User-Agent: FaHv3"\
+  --request POST \
+  --data '{"serialNumber" : "2302300012345", "pairingToken" : "XXX_base64_endcode_XXX"}' \ 
+  https://server-backend-prod.lunii.com/devices/
+```
+#### Response
 
 ### Sign In 
+#### Payload
+```JSON
+{
+    "vendorId": "0x0483",
+    "productId": "0xa341",
+    "firmwareVersion": "3.1.2",
+    "sdCardSize": 1024,
+    "sdCardFree": 1000,
+    "sdCardUsed": 24,
+    "batteryLevel": 95,
+    "batteryCharging": false,
+    "wifiLevel": 5,
+    "wifiSsid": "LUNII_AP"
+}
+```
+
+#### Request
+
+```bash
     curl -x socks5://localhost:9050 \
       --header "Content-Type: application/json" \
       --header "User-Agent: FaHv3"\
       --request POST \
       --data '{"vendorId": "0x0483", "productId": "0xa341", "firmwareVersion": "3.1.2", "sdCardSize": 1024, "sdCardFree": 1000, "sdCardUsed": 24,"batteryLevel": 95, "batteryCharging": false, "wifiLevel": 5, "wifiSsid": "LUNII_AP"}' \
       https://server-backend-prod.lunii.com/devices/23023030012345/signin
+```
 
+#### Response
+```bash
     {"challenge":"oMjxuoautvnhMYbJDMcPx2nMmO7T1YRMPP_s9kOxf4w","isUpdateAvailable":false}
     # b64 : oMjxuoautvnhMYbJDMcPx2nMmO7T1YRMPP_s9kOxf4w
     # hex : A0C8F1BA86AEB6F9E13186C90CC70FC769CC98EED3D5844C3CFB3D90EC5FE3
     # txt : lunii: ???????
+```
 
 ### Sign Out
 TBF 
