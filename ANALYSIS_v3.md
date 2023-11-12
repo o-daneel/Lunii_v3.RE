@@ -245,12 +245,99 @@ Each CMD_LIST is made of :
 - CMD_write_metadata
 
 # Wifi
-**(huge thanks to @Totol)**
+**(huge thanks to @ToToL)**
 
 Those commands are to be sent on **Lunii-SNUXXXXXX** hotspot, on server **192.168.4.1:3334**  
 TODO : add pictures / ref
 
+## Get Wifi PSK
 
+Wifi PSK is given in the Android APK if the APK can't connect to the WIFI. It
+display the message "Se connecter manuellement au WiFi" and give the PSK for
+your Lunii. PSK is different for each Lunii.
+
+This Wifi PSK came from
+https://server-backend-prod.lunii.com/factory/products/SNUXXXXXX key
+json.wap.secret
+
+```JSON 
+{
+  "createdAt": "2023-08-10T09:11:15.983Z",
+  "reference": "LUNII_03_FR_STD",
+  "serialNumber": "SNUXXXXXX",
+  "updatedAt": "2023-08-10T09:11:15.983Z",
+  "version": "v3",
+  "wap": {
+    "secret" : "mamie929",
+    "ssid"    : "Lunii-subSNUXXXXXX"
+  }
+}
+```
+
+## DHCP
+
+It seems that there is a DHCP that give you IP on range 192.168.4.2-254.
+TODO : Need to be more tested
+
+## Communicate with Lunii
+
+A simple "telnet 192.168.4.1 3334" is enought to send commands.
+
+Requests are always JSON like:
+```JSON 
+{
+  "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": "1699754392",
+  "message" : {
+    "key1": "value1",
+    "key2": "value2",
+    ...
+  }
+}
+```
+
+- id: seems to be a uniq ID just to link with the answer
+- timestamp: the timestamp :), it seems that old timestamps works
+- message: keys/values for the command
+
+Answers are always in two parts:
+- First part: a JSON to indicate if the command is OK or not
+```JSON 
+{
+  "source_id": "f3f61d43-8130-11ee-b0ad-cd0c2f4a20b4",
+  "timestamp":1699775774,
+  "type":0,
+  "status":0
+}
+```
+
+- source_id: the same id as the request
+- timestamp: maybe the timestamp of the request. It seems to be identical
+- type: 0 for first response, 1 for second response
+- status: 0 for OK, -1 for KO
+
+- Second part: a JSON with the returned data of the command, if the command
+  return a data
+```JSON
+{
+  "source_id": "f3f61d43-8130-11ee-b0ad-cd0c2f4a20b4",
+  "timestamp":1699775774,
+  "type":1,
+  "status":0,
+  "data": the_data
+}
+```
+
+- source_id: the same id as the request
+- timestamp: maybe the timestamp of the request. It seems to be identical
+- type: 0 for first response, 1 for second response
+- status: 0 for OK, -1 for KO
+- data: the data, maybe array [] or dictionnary {}
+
+## Making a fake Lunii
+
+You can write a simple TCP server that correctly respond to commands to
+simulate a Lunii for the Android APK
 
 ## Messages
 Commands are defined a JSON format with those commands supported:
@@ -262,7 +349,10 @@ Commands are defined a JSON format with those commands supported:
 - REMOVE_WIFI  
 - FACTORY_RESET  
 
-### LINK_FAH  
+### LINK_FAH 
+
+#### Request
+ 
 ```JSON 
 {
   "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
@@ -275,7 +365,17 @@ Commands are defined a JSON format with those commands supported:
   }
 }
 ```
+
+#### Response
+
+TODO : How to generate this command ?
+
 ### SCAN_WIFI
+
+Scan for Wifi the Lunii can see
+
+#### Request
+
 ```JSON 
 {
   "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
@@ -285,8 +385,47 @@ Commands are defined a JSON format with those commands supported:
   }
 }
 ```
+
+#### Response
+
+```JSON 
+{
+  "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": 1699754392,
+  "type":0,
+  "status":0
+}
+{
+  "source_id":"c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "type":1,
+  "status":0,
+  "timestamp":1699754392,
+  "data": {
+    "scan_duration": 2,
+    "networks": [
+      {
+        "ssid": "HOME",
+        "bssid": "XX:XX:XX:XX:XX:XX",
+        "secure": 4,
+        "rssi": -40
+      },
+      {
+        "ssid": "OpenWifi",
+        "bssid": "XX:XX:XX:XX:XX:XX",
+        "secure": 4,
+        "rssi": -40
+      }
+    ]
+  }
+}
+```
+
 ### LIST_WIFI 
+
 Returns the list of configured wifi in the Lunii 
+
+#### Request
+
 ```JSON 
 {
   "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
@@ -296,13 +435,21 @@ Returns the list of configured wifi in the Lunii
   }
 }
 ```
-### Response
+
+#### Response
+
 ```JSON 
 {
-  "source_id": "%s",
-  "type": %i,
-  "status": %i,
-  "timestamp": %lu,
+  "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": 1699754392,
+  "type":0,
+  "status":0
+}
+{
+  "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "type": 1,
+  "status": 0,
+  "timestamp": 1699754392,
   "data": [
     {"bssid":"%s","ssid":"%s"},
     {"bssid":"%s","ssid":"%s"},
@@ -312,7 +459,11 @@ Returns the list of configured wifi in the Lunii
 ```
 
 ### ADD_WIFI
+
 Tries to connect, if success, it adds the network if it was not existing, or it updates the existing one.  
+
+#### Request
+
 ```JSON 
 {
   "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
@@ -320,12 +471,30 @@ Tries to connect, if success, it adds the network if it was not existing, or it 
   "message" : {
     "command": "ADD_WIFI",
     "ssid"    : "wifi_ssid",
+    "bssid"    : "wifi_bssid",
     "password": "wifi_password",
   }
 }
 ```
+
+#### Response
+
+```JSON 
+{
+  "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": 1699754392,
+  "type":0,
+  "status":0
+}
+```
+
+Then the Lunii connect to the Wifi
+
 ### REMOVE_WIFI  
 Removes a Wifi conf entry based on a BSSID
+
+#### Request
+
 ```JSON 
 {
   "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
@@ -336,7 +505,28 @@ Removes a Wifi conf entry based on a BSSID
   }
 }
 ```
+
+#### Response
+
+```JSON 
+{
+  "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": 1699754392,
+  "type":0,
+  "status":0
+}
+{
+  "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
+  "timestamp": 1699754392,
+  "type":1,
+  "status":0
+}
+```
+
 ### FACTORY_RESET  
+
+#### Request
+
 ```JSON 
 {
   "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
@@ -347,17 +537,16 @@ Removes a Wifi conf entry based on a BSSID
 }
 ```
 
-## Responses
+#### Response
+
 ```JSON 
 {
   "source_id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
   "timestamp": "1699754392",
   "type": "0",
   "status": "0",
-  "data" : []
 }
 ```
-
 
 # Backend
 ## Functions
