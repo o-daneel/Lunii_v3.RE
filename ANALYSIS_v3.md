@@ -15,15 +15,17 @@
     - [Handlers](#handlers)
     - [List](#list)
 - [Wifi](#wifi)
+  - [Get Wifi PSK](#get-wifi-psk)
+  - [DHCP](#dhcp)
+  - [Communicate with Lunii](#communicate-with-lunii)
+  - [Making a fake Lunii](#making-a-fake-lunii)
   - [Messages](#messages)
     - [LINK\_FAH](#link_fah)
     - [SCAN\_WIFI](#scan_wifi)
     - [LIST\_WIFI](#list_wifi)
-    - [Response](#response)
     - [ADD\_WIFI](#add_wifi)
     - [REMOVE\_WIFI](#remove_wifi)
     - [FACTORY\_RESET](#factory_reset)
-  - [Responses](#responses)
 - [Backend](#backend)
   - [Functions](#functions)
   - [Endpoints](#endpoints)
@@ -149,7 +151,7 @@ It also contains storyteller identification data :
 
 ## Device specific
 
-This section seems to be personalized in factory through test mode, using CMD_write_metadata.  
+This section seems to be personalized in factory through test mode, using **CMD_write_metadata**.  
 It receives a text block (0x130 Bytes long) where everything must be hex text like : "03FA...FFFF"
 1. checks the contents, only chars `0-9A-F` and length `0x130`
 2. converts all hex text to uint values
@@ -242,12 +244,13 @@ Each CMD_LIST is made of :
 - CMD_vbat
 - CMD_wheel
 - CMD_wifi
-- CMD_write_metadata
+- CMD_write_metadata  
+  (this command seems to be the one used to personalize the Lunii device)
 
 # Wifi
 **(huge thanks to @ToToL)**
 
-Those commands are to be sent on **Lunii-SNUXXXXXX** hotspot, on server **192.168.4.1:3334**  
+Those commands are to be sent on **Lunii-23023031234567** hotspot, on server **192.168.4.1:3334**  
 TODO : add pictures / ref
 
 ## Get Wifi PSK
@@ -257,19 +260,26 @@ display the message "Se connecter manuellement au WiFi" and give the PSK for
 your Lunii. PSK is different for each Lunii.
 
 This Wifi PSK came from
-https://server-backend-prod.lunii.com/factory/products/SNUXXXXXX key
-json.wap.secret
+https://server-backend-prod.lunii.com/factory/products/23023031234567 
+key json.wap.secret
+
+#### Request
+**TODO** : 
+* @ToTol to get the request that generates this answer
+* Anyone to help finding how to get the JWT token from Lunii online credentials (objective is to have a **curl** command to get Auth token to get it's own wifi psk)
+
+#### Response
 
 ```JSON 
 {
   "createdAt": "2023-08-10T09:11:15.983Z",
   "reference": "LUNII_03_FR_STD",
-  "serialNumber": "SNUXXXXXX",
+  "serialNumber": "23023031234567",
   "updatedAt": "2023-08-10T09:11:15.983Z",
   "version": "v3",
   "wap": {
     "secret" : "mamie929",
-    "ssid"    : "Lunii-subSNUXXXXXX"
+    "ssid"    : "Lunii-3031234567 "
   }
 }
 ```
@@ -281,7 +291,7 @@ TODO : Need to be more tested
 
 ## Communicate with Lunii
 
-A simple "telnet 192.168.4.1 3334" is enought to send commands.
+A simple "telnet 192.168.4.1 3334" is enough to send commands.
 
 Requests are always JSON like:
 ```JSON 
@@ -297,11 +307,12 @@ Requests are always JSON like:
 ```
 
 - id: seems to be a uniq ID just to link with the answer
-- timestamp: the timestamp :), it seems that old timestamps works
+- timestamp: the timestamp 😆, it seems that old timestamps works
 - message: keys/values for the command
 
 Answers are always in two parts:
-- First part: a JSON to indicate if the command is OK or not
+#### First part: Command ACK
+> a JSON to indicate if the command is OK or not
 ```JSON 
 {
   "source_id": "f3f61d43-8130-11ee-b0ad-cd0c2f4a20b4",
@@ -310,13 +321,13 @@ Answers are always in two parts:
   "status":0
 }
 ```
+  - source_id: the same id as the request
+  - timestamp: maybe the timestamp of the request. It seems to be identical
+  - type: 0 for first response, 1 for second response
+  - status: 0 for OK, -1 for KO
 
-- source_id: the same id as the request
-- timestamp: maybe the timestamp of the request. It seems to be identical
-- type: 0 for first response, 1 for second response
-- status: 0 for OK, -1 for KO
-
-- Second part: a JSON with the returned data of the command, if the command
+#### Second part: Response Data
+> a JSON with the returned data of the command, if the command
   return a data
 ```JSON
 {
@@ -327,7 +338,6 @@ Answers are always in two parts:
   "data": the_data
 }
 ```
-
 - source_id: the same id as the request
 - timestamp: maybe the timestamp of the request. It seems to be identical
 - type: 0 for first response, 1 for second response
@@ -350,6 +360,11 @@ Commands are defined a JSON format with those commands supported:
 - FACTORY_RESET  
 
 ### LINK_FAH 
+Initiates the process of pairing a remote Lunii account with a device. This is a two step process:
+1. A token is sent from remote server to the Lunii storyteller.   
+   (this token will be associated to the online account)
+2. The Lunii device will cipher the token and return it as a JSON payload along with SNU  
+   (this allows the remote server to retrieve the device key from SNU and check that original token is genuine)
 
 #### Request
  
@@ -368,8 +383,9 @@ Commands are defined a JSON format with those commands supported:
 
 #### Response
 
-TODO : How to generate this command ?
+**TODO** : How to generate this command ?
 
+To be filled based on Ghidra
 ### SCAN_WIFI
 
 Scan for Wifi the Lunii can see
@@ -469,9 +485,9 @@ Tries to connect, if success, it adds the network if it was not existing, or it 
   "id": "c5c96de5-39d6-4133-8301-b33cd1afa5ac",
   "timestamp": "1699754392",
   "message" : {
-    "command": "ADD_WIFI",
+    "command" : "ADD_WIFI",
     "ssid"    : "wifi_ssid",
-    "bssid"    : "wifi_bssid",
+    "bssid"   : "wifi_bssid",
     "password": "wifi_password",
   }
 }
@@ -501,7 +517,7 @@ Removes a Wifi conf entry based on a BSSID
   "timestamp": "1699754392",
   "message" : {
     "command": "REMOVE_WIFI",
-    "bssid"    : "wifi_bssid",
+    "bssid"  : "wifi_bssid",
   }
 }
 ```
@@ -524,6 +540,7 @@ Removes a Wifi conf entry based on a BSSID
 ```
 
 ### FACTORY_RESET  
+Performs a factory reset
 
 #### Request
 
@@ -559,12 +576,13 @@ Removes a Wifi conf entry based on a BSSID
     backend_upload_progress
 
 ## Endpoints
+    https://server-backend-prod.lunii.com/factory/products/_SNU_14_CHARS_ 
     https://server-backend-prod.lunii.com/user/devices
     https://server-backend-prod.lunii.com/devices
-    https://server-backend-prod.lunii.com/devices/%s/signin
-    https://server-backend-prod.lunii.com/devices/%s/signout
-    https://server-backend-prod.lunii.com/devices/%s/audiobooks/
-    https://server-backend-prod.lunii.com/devices/%s/audiobooks/%s
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signin
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signout
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/%s
 
 ### User Info
 #### Payload
@@ -617,7 +635,7 @@ Receive token, ciphered with dev key and sent back to server as JSON data
 #### Payload
 ```JSON
 {
-  "serialNumber" : "2302300012345",
+  "serialNumber" : "23023031234567",
   "pairingToken" : "XXX_base64_endcode_XXX"
 }
 ```  
@@ -629,7 +647,7 @@ curl -x socks5://localhost:9050 \
   --header "Content-Type: application/json" \
   --header "User-Agent: FaHv3"\
   --request POST \
-  --data '{"serialNumber" : "2302300012345", "pairingToken" : "XXX_base64_endcode_XXX"}' \ 
+  --data '{"serialNumber" : "23023031234567", "pairingToken" : "XXX_base64_endcode_XXX"}' \ 
   https://server-backend-prod.lunii.com/devices/
 ```
 #### Response
@@ -659,7 +677,7 @@ curl -x socks5://localhost:9050 \
       --header "User-Agent: FaHv3"\
       --request POST \
       --data '{"vendorId": "0x0483", "productId": "0xa341", "firmwareVersion": "3.1.2", "sdCardSize": 1024, "sdCardFree": 1000, "sdCardUsed": 24,"batteryLevel": 95, "batteryCharging": false, "wifiLevel": 5, "wifiSsid": "LUNII_AP"}' \
-      https://server-backend-prod.lunii.com/devices/23023030012345/signin
+      https://server-backend-prod.lunii.com/devices/23023031234567/signin
 ```
 
 #### Response
