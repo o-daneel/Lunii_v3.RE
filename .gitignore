@@ -4,6 +4,7 @@ ghidra/*Apk*
 ghidra/Lunii*.rep
 ghidra/Lunii*.gpr
 ghidra/Lunii*.lock*
+ghidra/modules/newlib
 resources/pictures/**/*.jpg
 dump/*
 ida

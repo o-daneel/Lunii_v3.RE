@@ -579,10 +579,16 @@ Performs a factory reset
     https://server-backend-prod.lunii.com/factory/products/_SNU_14_CHARS_ 
     https://server-backend-prod.lunii.com/user/devices
     https://server-backend-prod.lunii.com/devices
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/avatar
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/settings
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/firmware?installed=3.1.2
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/boot?command=[RESET, ONBOARDED]
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signin
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signout
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/%s
+  
+(all of them are listed in com.lunii.sdk.feature.backend.device.BackendDeviceRepository)
 
 ### User Info
 #### Payload
