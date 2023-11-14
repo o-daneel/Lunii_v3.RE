@@ -578,6 +578,8 @@ Performs a factory reset
 ## Endpoints
     https://server-backend-prod.lunii.com/factory/products/_SNU_14_CHARS_ 
     https://server-backend-prod.lunii.com/user/devices
+    https://server-backend-prod.lunii.com/user/audiobooks
+    https://server-backend-prod.lunii.com/user/sync/devices/UUID
     https://server-backend-prod.lunii.com/devices
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/avatar
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/settings
@@ -586,9 +588,9 @@ Performs a factory reset
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signin
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signout
     https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/%s
+    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/c4139d59-872a-4d15-8cf1-76d34cdf38c6
   
-(all of them are listed in com.lunii.sdk.feature.backend.device.BackendDeviceRepository)
+(all of them are listed in com.lunii.sdk.feature.backend packages)
 
 ### User Info
 #### Payload
