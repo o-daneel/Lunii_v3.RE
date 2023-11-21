@@ -32,6 +32,23 @@ Work in progress to extract the root key that seems to be the **device key**.
 
 ## Reverse state 📈  
 
+### Bootloader - v3.0
+**NOTE** : Many code sections are not yet identified. Real number are far lower
+| Code size | in KB |
+| - | -: |
+| Total FW size  | `40` |
+| Identified symbols | `2` |
+|  |  |
+> **6%** of firmware reversed and decompiled
+
+| Symbols | count |
+| - | -: |
+| Total Symbols (fn + data) | `494` |
+| No yet identified | `316` |
+|  |  |
+> **<5%** of Symbols reversed and decompiled
+
+### Main FW - v3.1.2
 | Code size | in KB |
 | - | -: |
 | Total FW size  | `582` |
@@ -59,8 +76,8 @@ Work in progress to extract the root key that seems to be the **device key**.
     * ~~identify update decipher~~
     * ~~identify header decipher~~
     * ~~locate AES Key~~
-      * STM32 AES sample code usage (for structs)
-      * review Lunii AES usage
+      * ~~STM32 AES sample code usage (for structs)~~
+      * ~~review Lunii AES usage~~
     * ~~Review FreeRTOS usage~~
     * ~~Review FatFS~~
     * ~~Review story management~~
