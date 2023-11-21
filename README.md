@@ -35,16 +35,16 @@ Work in progress to extract the root key that seems to be the **device key**.
 | Code size | in KB |
 | - | -: |
 | Total FW size  | `582` |
-| Identified symbols | `507` |
+| Identified symbols | `509` |
 |  |  |
-> **86%** of firmware reversed and decompiled
+> **87%** of firmware reversed and decompiled
 
 | Symbols | count |
 | - | -: |
-| Total Symbols (fn + data) | `2473` |
-| No yet identified | `549` |
-|  |  | 
-> **77%** of Symbols reversed and decompiled
+| Total Symbols (fn + data) | `2478` |
+| No yet identified | `484` |
+|  |  |
+> **80%** of Symbols reversed and decompiled
 
 # Work in Progress
 
