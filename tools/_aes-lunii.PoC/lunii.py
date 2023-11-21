@@ -1,53 +1,64 @@
+import os
 import glob
 import pathlib
 
-import xxtea
-import os
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
 import binascii
-import click
-
 
 def vectkey_to_bytes(key_vect):
     joined = [k.to_bytes(4, 'little') for k in key_vect]
     return b''.join(joined)
 
+# internal flash personnalized value @0x0800BE00
+# AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
+raw_key_device = [0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC, 0xDDDDDDDD]
+dev_key = vectkey_to_bytes(raw_key_device)
 
-# external flash hardcoded value
-# 91BD7A0A A75440A9 BBD49D6C E0DCC0E3
-raw_key_generic = [0x91BD7A0A, 0xA75440A9, 0xBBD49D6C, 0xE0DCC0E3]
-lunii_generic_key = vectkey_to_bytes(raw_key_generic)
+# 55555555 66666666 77777777 88888888
+raw_iv_device = [0x55555555, 0x66666666, 0x77777777, 0x88888888]
+dev_iv = vectkey_to_bytes(raw_iv_device)
 
-# internal flash contents
-# AABBCCDD AABBCCDD AABBCCDD AABBCCDD
-# reordered
-# AABBCCDD AABBCCDD AABBCCDD AABBCCDD
-raw_key_device = [0xAABBCCDD, 0xAABBCCDD, 0xAABBCCDD, 0xAABBCCDD]
-lunii_device_key = vectkey_to_bytes(raw_key_device)
+# generic value read from bt file (ciphered with device key)
+# AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
+raw_key_generic = [0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC, 0xDDDDDDDD]
+gen_key = vectkey_to_bytes(raw_key_generic)
 
-# lunii_hexkey = b'AABBCCDDAABBCCDDAABBCCDDAABBCCDD'
-# lunii_keyB = binascii.unhexlify(lunii_hexkey)
+# 55555555 66666666 77777777 88888888
+raw_iv_generic = [0x55555555, 0x66666666, 0x77777777, 0x88888888]
+gen_iv = vectkey_to_bytes(raw_iv_generic)
 
 
 def sample_code():
-    print(f"Key : {binascii.hexlify(lunii_generic_key)}")
+
+    print(f"Key : {binascii.hexlify(dev_key)} | IV : {binascii.hexlify(dev_iv)}")
 
     s = b"xxtea is good"
 
-    enc = xxtea.encrypt(s, lunii_generic_key)
-    dec = xxtea.decrypt(enc, lunii_generic_key)
-    print(s)
-    print(enc)
-    print(dec)
+    # Crée un objet AES avec le mode CBC
+    decipher = AES.new(dev_key, AES.MODE_CBC, dev_iv)
+    cipher = AES.new(dev_key, AES.MODE_CBC, dev_iv)
 
-    hexenc = xxtea.encrypt_hex(s, lunii_generic_key)
-    hexdec = xxtea.decrypt_hex(hexenc, lunii_generic_key)
-    print(s)
-    print(hexenc)
-    print(hexdec)
+    plain_hex = "323330323330333030313233343500000000000000000000323330323330333030313233343500000000000000000000"
+    plain = binascii.unhexlify(plain_hex)
 
+    # Chiffrage des données
+    ciphered = cipher.encrypt(plain)
+    ciphered_hex = binascii.hexlify(ciphered).decode('utf-8')
 
-def lunii_tea_rounds(buffer):
-    return int(1 + 52 / (len(buffer)/4))
+    # Déchiffre les données
+    plain2 = decipher.decrypt(ciphered)
+    plain2_hex = binascii.hexlify(plain2).decode('utf-8')
+
+    # Affiche les données 
+    print(f"Plain    : {plain_hex}")
+    print(f"Ciphered : {ciphered_hex.upper()}")
+    print(f"Plain    : {plain2_hex}")
+
+    if plain == plain2:
+        print("👍")
+    else:
+        print("👎")
 
 
 def sample_file():
@@ -66,7 +77,8 @@ def sample_file():
         print(hexdec)
 
 
-def untea_file(key, filename, extension):
+# Decipher one file
+def dec_file(key, filename, extension):
     if pathlib.Path(filename).is_dir():
         return
 
@@ -88,22 +100,24 @@ def untea_file(key, filename, extension):
     print(f" as {filename}{extension}")
 
 
-def untea_dir(key, dirname, extension):
+# Decipher one directory
+def dec_dir(key, dirname, extension):
     res_list = glob.glob(dirname + "*")
     res_list = [item for item in res_list if os.path.splitext(item)[1] == ""]
     print(res_list)
 
     for file in res_list:
-        untea_file(key, file, extension)
+        dec_file(key, file, extension)
 
 
-def untea_story():
-    untea_dir(lunii_generic_key, "../../dump/1362862A/rf/000/", ".bmp")
-    untea_dir(lunii_generic_key, "../../dump/1362862A/sf/000/", ".mp3")
-    untea_dir(lunii_generic_key, "../../dump/1362862A/", ".bin")
-    # untea_file(lunii_generic_key, "../../dump/root_sd/.md_p2", ".bin")
-    # untea_file(lunii_device_key, "../../dump/1362862A/bt_p1", ".bin")
+def dec_story():
+    dec_dir(lunii_generic_key, "../../dump/1362862A/rf/000/", ".bmp")
+    dec_dir(lunii_generic_key, "../../dump/1362862A/sf/000/", ".mp3")
+    dec_dir(lunii_generic_key, "../../dump/1362862A/", ".bin")
+    # dec_file(lunii_generic_key, "../../dump/root_sd/.md_p2", ".bin")
+    # dec_file(lunii_device_key, "../../dump/1362862A/bt_p1", ".bin")
 
 
 if __name__ == '__main__':
-    untea_story()
+    sample_code()
+    # dec_story()
