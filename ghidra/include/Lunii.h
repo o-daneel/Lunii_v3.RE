@@ -1,3 +1,6 @@
+#define __CC_ARM
+typedef char TCHAR;
+
 typedef unsigned char   undefined;
 
 typedef unsigned char    bool;
@@ -25,7 +28,7 @@ typedef enum FATFS_OPEN_MODE { /* File access mode and open method flags (3rd ar
     FA_OPEN_APPEND=48
 } FATFS_OPEN_MODE;
 
-#include "ff.h"
+// #include "ff.h"
 
 typedef enum ESP32_AP_ENC {
     OPEN=0,
@@ -263,6 +266,5 @@ struct VectorTable { /* Interrupt and exception vectors */
     undefined4 field117_0x1d4; /* Reserved */
     undefined4 field118_0x1d8; /* Reserved */
     pointer SDMMC2;
-    undefined4 field120_0x1e0; /* Reserved */
 };
 

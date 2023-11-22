@@ -33,20 +33,20 @@ Work in progress to extract the root key that seems to be the **device key**.
 ## Reverse state 📈  
 
 ### Bootloader - v3.0
-**NOTE** : Many code sections are not yet identified. Real number are far lower
+**NOTE** : Many code sections are not yet identified. Numbers might be overestimated
 | Code size | in KB |
 | - | -: |
-| Total FW size  | `40` |
-| Identified symbols | `2` |
+| Total FW size  | `47` |
+| Identified symbols | `26` |
 |  |  |
-> **6%** of firmware reversed and decompiled
+> **56%** of firmware reversed and decompiled
 
 | Symbols | count |
 | - | -: |
-| Total Symbols (fn + data) | `494` |
-| No yet identified | `316` |
+| Total Symbols (fn + data) | `744` |
+| No yet identified | `338` |
 |  |  |
-> **<5%** of Symbols reversed and decompiled
+> **54%** of Symbols reversed and decompiled
 
 ### Main FW - v3.1.2
 | Code size | in KB |
