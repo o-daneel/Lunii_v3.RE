@@ -78,30 +78,41 @@ def sample_file():
 
 
 # Decipher one file
-def dec_file(key, filename, extension):
+def dec_file(key, iv, filename, extension, offset = 0, dec_len = 0):
     if pathlib.Path(filename).is_dir():
         return
 
-    with open(filename, "rb") as fp:
-        # processing first block
-        ciphered = fp.read(0x200)
-        if len(ciphered) == 0:
-            return
+    print(f"Processing {filename}", end="")
 
-        print(f"Processing {filename}", end="")
+    with open(filename + extension, "wb") as fo:
+        # duplicating the file
+        with open(filename, "rb") as fp:
+            contents = fp.read()
+        fo.write(contents)
 
-        with open(fp.name + extension, "wb") as plain_file:
-            dec = xxtea.decrypt(ciphered, key, padding=False, rounds=lunii_tea_rounds(ciphered))
-            plain_file.write(dec)
+        # processing the ciphered part
+        with open(filename, "rb") as fp:
+            # checking dec_len and offset
+            if not dec_len:
+                file_stats = os.stat(filename)
+                if offset < file_stats.st_size:
+                    dec_len = file_stats.st_size - offset
 
-            # if anything left, copy
-            plain = fp.read()
-            plain_file.write(plain)
+            # processing the ciphered block
+            fp.seek(offset)
+            ciphered_data = fp.read(dec_len)
+
+        decipher = AES.new(dev_key, AES.MODE_CBC, dev_iv)
+        plain_data = decipher.decrypt(ciphered_data)
+
+        fo.seek(offset)
+        fo.write(plain_data)
+
     print(f" as {filename}{extension}")
 
 
 # Decipher one directory
-def dec_dir(key, dirname, extension):
+def dec_dir(key, iv, dirname, extension):
     res_list = glob.glob(dirname + "*")
     res_list = [item for item in res_list if os.path.splitext(item)[1] == ""]
     print(res_list)
@@ -111,13 +122,15 @@ def dec_dir(key, dirname, extension):
 
 
 def dec_story():
-    dec_dir(lunii_generic_key, "../../dump/1362862A/rf/000/", ".bmp")
-    dec_dir(lunii_generic_key, "../../dump/1362862A/sf/000/", ".mp3")
-    dec_dir(lunii_generic_key, "../../dump/1362862A/", ".bin")
+    # dec_dir(lunii_generic_key, "../../dump/1362862A/", ".bin")
     # dec_file(lunii_generic_key, "../../dump/root_sd/.md_p2", ".bin")
     # dec_file(lunii_device_key, "../../dump/1362862A/bt_p1", ".bin")
-
+    pass
 
 if __name__ == '__main__':
-    sample_code()
-    # dec_story()
+    # sample_code()
+    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash1.bin", 0x92000, 0x20)
+    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash2.bin", 0x92020, 0x20)
+    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash3.bin", 0x92000, 0x40)
+    dec_file(dev_key, dev_iv, "resources/flash_swap/md.Frederir.orig", ".plain", 0x40)
+    

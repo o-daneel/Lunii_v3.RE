@@ -33,5 +33,8 @@ for l in user.json()['response']['luniis']:
         print("  - {0}: id: {1}, SNU: {2}, version: {3}".format(ll['name'], l, ll_serial, ll['version']))
 
 fw = requests.get(f"https://server-backend-prod.lunii.com/devices/{luniis[0]}/firmware?installed=2.6", headers=header_auth)
-with open("fa.bin", "wb") as fa:
-    fa.write(fw.content)
+if fw.status_code == 200:
+    with open("fa.bin", "wb") as fa:
+        fa.write(fw.content)
+else:
+    print(fw.json())
