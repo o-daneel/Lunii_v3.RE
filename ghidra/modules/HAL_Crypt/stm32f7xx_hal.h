@@ -1,2 +1,0 @@
-#define AES 
-#define HAL_CRYP_MODULE_ENABLED

@@ -2,6 +2,7 @@
 # Hardware
 (based on FW analysis + pictures of board)
 
+* Torx n°6
 * Battery : Li-ion 4.2v 600mAh   
   Model 503040 - 1INP5/31/41
 * Main CPU : [STM32F730Z8T6](docs/stm32f730z8.pdf) - Cortex M7 - LQFP144  

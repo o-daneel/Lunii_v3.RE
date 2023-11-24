@@ -19,6 +19,8 @@ dev_key = vectkey_to_bytes(raw_key_device)
 raw_iv_device = [0x55555555, 0x66666666, 0x77777777, 0x88888888]
 dev_iv = vectkey_to_bytes(raw_iv_device)
 
+from  aes_keys import *
+
 # generic value read from bt file (ciphered with device key)
 # AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
 raw_key_generic = [0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC, 0xDDDDDDDD]
@@ -77,6 +79,33 @@ def sample_file():
         print(hexdec)
 
 
+def dec_cmd(key, iv, filename, extension):
+    if pathlib.Path(filename).is_dir():
+        return
+
+    print(f"Processing {filename}", end="")
+
+    with open(filename + extension, "wb") as fo:
+        # duplicating the file
+        with open(filename, "rb") as fp:
+            # processing header
+            header = fp.read(0x10)
+            decipher = AES.new(key, AES.MODE_CBC, iv)
+            plain = decipher.decrypt(header)
+            fo.write(plain)
+
+            # processing commands
+            cmd_data = ".."
+            while cmd_data:
+                cmd_data = fp.read(0x30)
+                decipher = AES.new(key, AES.MODE_CBC, iv)
+                plain = decipher.decrypt(cmd_data)
+                fo.write(plain)
+
+    print(f" as {filename}{extension}")
+
+
+
 # Decipher one file
 def dec_file(key, iv, filename, extension, offset = 0, dec_len = 0):
     if pathlib.Path(filename).is_dir():
@@ -102,7 +131,7 @@ def dec_file(key, iv, filename, extension, offset = 0, dec_len = 0):
             fp.seek(offset)
             ciphered_data = fp.read(dec_len)
 
-        decipher = AES.new(dev_key, AES.MODE_CBC, dev_iv)
+        decipher = AES.new(key, AES.MODE_CBC, iv)
         plain_data = decipher.decrypt(ciphered_data)
 
         fo.seek(offset)
@@ -132,5 +161,7 @@ if __name__ == '__main__':
     # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash1.bin", 0x92000, 0x20)
     # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash2.bin", 0x92020, 0x20)
     # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash3.bin", 0x92000, 0x40)
-    dec_file(dev_key, dev_iv, "resources/flash_swap/md.Frederir.orig", ".plain", 0x40)
+    dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/fa.23023030035037.bin", ".plain")
+    dec_cmd(dev_key, dev_iv, "cmd.23023030035037.ONBOARDED", ".plain")
+    dec_cmd(dev_key, dev_iv, "cmd.23023030035037.RESET", ".plain")
     

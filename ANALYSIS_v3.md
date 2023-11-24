@@ -172,6 +172,7 @@ It receives a text block (0x130 Bytes long) where everything must be hex text li
 ## Main Firmware
 The full firmware ! located at `0x90000000`  
 **Version :** 3.1.2   
+**Last Update :** 3.1.3   
 **Note :** This firmware can be updated
 
 ### Mapping
@@ -576,19 +577,22 @@ Performs a factory reset
     backend_upload_progress
 
 ## Endpoints
-    https://server-backend-prod.lunii.com/factory/products/_SNU_14_CHARS_ 
-    https://server-backend-prod.lunii.com/user/devices
-    https://server-backend-prod.lunii.com/user/audiobooks
-    https://server-backend-prod.lunii.com/user/sync/devices/UUID
-    https://server-backend-prod.lunii.com/devices
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/avatar
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/settings
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/firmware?installed=3.1.2
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/boot?command=[RESET, ONBOARDED]
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signin
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signout
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/
-    https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/c4139d59-872a-4d15-8cf1-76d34cdf38c6
+    - GET  https://server-backend-prod.lunii.com/user/devices
+    - GET  https://server-backend-prod.lunii.com/user/audiobooks
+      POST https://server-backend-prod.lunii.com/user/sync/devices/UUID + body items
+
+    - GET https://server-backend-prod.lunii.com/factory/products/_SNU_14_CHARS_ 
+    
+    - POST https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signin?link=usb + body signin
+    - GET  https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/signout
+    - POST https://server-backend-prod.lunii.com/devices + body snu + body pairingToken
+      POST https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/ + body items
+      GET  https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/c4139d59-872a-4d15-8cf1-76d34cdf38c6
+      PUT  https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/audiobooks/c4139d59-872a-4d15-8cf1-76d34cdf38c6 + body progress
+    - GET  https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/firmware?installed=3.1.2
+      GET  https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/avatar
+    - GET  https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/settings
+    - GET  https://server-backend-prod.lunii.com/devices/_SNU_14_CHARS_/boot?command=[RESET, ONBOARDED]
   
 (all of them are listed in com.lunii.sdk.feature.backend packages)
 
@@ -684,7 +688,7 @@ curl -x socks5://localhost:9050 \
       --header "Content-Type: application/json" \
       --header "User-Agent: FaHv3"\
       --request POST \
-      --data '{"vendorId": "0x0483", "productId": "0xa341", "firmwareVersion": "3.1.2", "sdCardSize": 1024, "sdCardFree": 1000, "sdCardUsed": 24,"batteryLevel": 95, "batteryCharging": false, "wifiLevel": 5, "wifiSsid": "LUNII_AP"}' \
+      --data '{"vendorId": "0x0483", "productId": "0xa341", "firmwareVersion": "3.1.2", "sdCardSize": 1024, "sdCardFree": 1000, "sdCardUsed": 24,"batteryLevel": 95, "batteryCharging": False, "wifiLevel": 5, "wifiSsid": "LUNII_AP"}' \
       https://server-backend-prod.lunii.com/devices/23023031234567/signin
 ```
 
@@ -975,18 +979,49 @@ This is a config file to store a date to define SDcard version. Fixed size of 20
 ### cmd
 * **Length** : variable
 * **Key** : device
-This file seems to be a script file to store personnalization step to perform on Lunii.
+This file is a script file to execute remote commands on Lunii.
 
-| Location | Command | Comments |
-| - | -: | - |
-| `0x9005E521`	| MSC_CMD_SET_ONBOARDING | - |
-| `0x9005E53D`	| MSC_CMD_RESET_ONBOARDING | - |
-| `0x9005E55B`	| MSC_CMD_CREATE | - |
-| `0x9005E56F`	| MSC_CMD_DELETE | - |
-| `0x9005E583`	| MSC_CMD_COPY | - |
-| `0x9005E595`	| MSC_CMD_MOVE | - |
-| `0x9005E5A7`	| MSC_CMD_REBOOT | - |
-| `0x9005E5ED`	| MSC_CMD_END | - |
+| Location | Command | ID | Comments |
+| - | -: | - | - |
+| `0x9005E521`	| MSC_CMD_SET_ONBOARDING | 3 | - |
+| `0x9005E53D`	| MSC_CMD_RESET_ONBOARDING | 4 | - |
+| `0x9005E55B`	| MSC_CMD_CREATE | 2 | - |
+| `0x9005E56F`	| MSC_CMD_DELETE | 1 | - |
+| `0x9005E583`	| MSC_CMD_COPY | 5 | Does nothing (legacy ?) |
+| `0x9005E595`	| MSC_CMD_MOVE | 6 | Does nothing (legacy ?) |
+| `0x9005E5A7`	| MSC_CMD_REBOOT | 0 | - |
+| `0x9005E5ED`	| MSC_CMD_END | 7 | - |
+
+Examples available in [cmd_files](./resources/cmd_files/)
+
+Structure:
+
+  `--- First 0x10B Block --- HEADER ---`  
+    
+      02 00 00 00 00 00 00 00  4C 55 4E 49 49 00 00 00  
+      NB of commands           Tag "LUNII"
+
+  `--- 0x30 Bytes Block --- CMD 1 ---`  
+
+    xx    YY    ZZ ZZ     
+    01 00 03 00 55 55 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 AA AA 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 CC CC
+
+* XX is the command number
+* YY is the command ID
+* ZZZZ is a tag to be checked  
+
+.     
+
+  `--- 0x30 Bytes Block --- CMD 2 ---`  
+
+    02 00 07 00 55 55 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 AA AA 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 CC CC
+Is the last block because command ID is `7`
+  
+**NOTE** : Every Block must be deciphered independently, no continuously.
 
 ### wifi.prefs
 * **Length** : 0x74 * 0xA = 0x488 (1160B)
@@ -1045,10 +1080,6 @@ Structure:
   `--- Second 48B Block --- CIPHERED ---`  
 Contains the device key, ciphered with generic key
 ``` 
-TO BE CONFIRMED
-v2 :
-    31333934XXYYZZ 0700 2600 3EF0112233 : 7Bytes of Unique Dev ID + 2 WORDS + 5 static Bytes
-    0000XXYY 60 times (0xF0) : TBD
 v3 :
     SNU copied twice and ciphered
     323031323131313132323333343400000000000000000000 : SNU - Storyteller Unique ID  (24 Bytes)

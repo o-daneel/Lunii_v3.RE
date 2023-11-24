@@ -68,8 +68,12 @@ Work in progress to extract the root key that seems to be the **device key**.
 ### TODO v3
 * Ghidra
   * on bootloader FW (expecting dump WIP)
-    * update process
-    * hash verification
+    * ~~update process~~
+    * hash verification : WIP
+      * ~~define type used~~ : SHA256
+      * understand final step
+    * generate a modified FW with Hash updated and verified
+    * generate a modified FW with Hash check on 0 block.
   * on mainFW
     * ~~update HW section based on FW~~
     * ~~import symbols from v2 : WIP~~
