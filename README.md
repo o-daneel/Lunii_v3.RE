@@ -37,16 +37,16 @@ Work in progress to extract the root key that seems to be the **device key**.
 | Code size | in KB |
 | - | -: |
 | Total FW size  | `47` |
-| Identified symbols | `26` |
+| Identified symbols | `35` |
 |  |  |
-> **56%** of firmware reversed and decompiled
+> **73%** of firmware reversed and decompiled
 
 | Symbols | count |
 | - | -: |
-| Total Symbols (fn + data) | `744` |
-| No yet identified | `338` |
+| Total Symbols (fn + data) | `601` |
+| No yet identified | `125` |
 |  |  |
-> **54%** of Symbols reversed and decompiled
+> **79%** of Symbols reversed and decompiled
 
 ### Main FW - v3.1.2
 | Code size | in KB |
@@ -63,17 +63,28 @@ Work in progress to extract the root key that seems to be the **device key**.
 |  |  |
 > **80%** of Symbols reversed and decompiled
 
+### Main FW - v3.1.3
+Not yet started
+
 # Work in Progress
 
 ### TODO v3
 * Ghidra
   * on bootloader FW (expecting dump WIP)
+    * ~~analyser la partie stdio avec reent~~
+    * ~~comprendre le post hash~~ --> sign verify ecdsa secp256r1
+    * ~~trouver la comparaison~~
+    * ~~pq un hash 256 = 32B = 8 UINT = 0x02~~
+      ~~pq dans le fw on a 0x40 ???~~ --> signature ecdsa
+    * ~~simuler le post hash avec un hash genuine (verifier qu'il recalcule correctement)~~
+    * ~~recalculer un hash modifié~~ --> impossible sans la clé privée
+    * verifier que le blob du fw est bien la signature du sha256 du fw, avec la clé 
     * ~~update process~~
-    * hash verification : WIP
+    * ~~hash verification : WIP~~
       * ~~define type used~~ : SHA256
-      * understand final step
-    * generate a modified FW with Hash updated and verified
-    * generate a modified FW with Hash check on 0 block.
+      * ~~understand final step~~ --> verify sign
+    * ~~generate a modified FW with Hash updated and verified~~ --> impossible
+    * ~~generate a modified FW with Hash check on 0 block.~~ --> impossible
   * on mainFW
     * ~~update HW section based on FW~~
     * ~~import symbols from v2 : WIP~~

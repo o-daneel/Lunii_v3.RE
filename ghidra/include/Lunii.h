@@ -4,6 +4,7 @@ typedef char TCHAR;
 typedef unsigned char   undefined;
 
 typedef unsigned char    bool;
+typedef unsigned char    BYTE;
 typedef unsigned char    byte;
 typedef unsigned int    dword;
 typedef long long    longlong;
@@ -15,6 +16,21 @@ typedef unsigned short    undefined2;
 typedef unsigned int    undefined4;
 typedef unsigned long long    undefined8;
 typedef unsigned short    ushort;
+
+
+typedef struct ecdsa_secp256r1{
+    uint ecdsa_type;
+    uint p[8];
+    uint n[8];
+    uint gx[8];
+    uint gy[8];
+    uint b[8];
+    // uint gy[8];
+    // uint n[8];
+    void * callback1;
+    void * callback2;
+    void * callback3;
+} ecdsa_params;
 
 
 
@@ -111,15 +127,15 @@ struct RTOS_Task {
     byte * buffer2;
 };
 
-struct sync_ff_callback {
-    FRESULT (*cb_read)( FIL **fp,void *buff,uint btr );
-    BYTE (*cb_seek)( FIL **fp,FSIZE_t ofs );
-    uint (*cb_close)( FIL **fp );
-    FIL * fp;
-    uint fp_pos;
-    BYTE * dummy1;
-    BYTE * dummy2;
-};
+// struct sync_ff_callback {
+//     FRESULT (*cb_read)( FIL **fp,void *buff,uint btr );
+//     BYTE (*cb_seek)( FIL **fp,FSIZE_t ofs );
+//     uint (*cb_close)( FIL **fp );
+//     FIL * fp;
+//     uint fp_pos;
+//     BYTE * dummy1;
+//     BYTE * dummy2;
+// };
 
 struct wifi_entry {
     BYTE used;
@@ -144,6 +160,9 @@ struct lunii_info {
 };
 
 typedef struct VectorTable VectorTable, *PVectorTable;
+
+typedef void (* Vector_Handler)(void);
+
 
 struct VectorTable { /* Interrupt and exception vectors */
     undefined4 field0_0x0; /* Reserved */
@@ -267,4 +286,3 @@ struct VectorTable { /* Interrupt and exception vectors */
     undefined4 field118_0x1d8; /* Reserved */
     pointer SDMMC2;
 };
-
