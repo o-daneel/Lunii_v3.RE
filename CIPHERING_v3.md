@@ -4,12 +4,15 @@
   - [Attack path](#attack-path)
     - [🚧 Dump Analysis](#-dump-analysis)
     - [Flash content update](#flash-content-update)
-    - [Known plain text attack](#known-plain-text-attack)
+    - [Flash Hot Swap](#flash-hot-swap)
+    - [Known plain text attack 💀 (NOPE)](#known-plain-text-attack--nope)
+    - [Exploit](#exploit)
     - [Backend auth token](#backend-auth-token)
-- [Keys](#keys)
-  - [Assumption](#assumption)
-  - [Generic](#generic)
+- [Keys (x3)](#keys-x3)
+    - [Assumption](#assumption)
   - [Device](#device)
+  - [Story](#story)
+  - [Firmware Signature](#firmware-signature)
 
 
 # TL;DR
@@ -20,29 +23,44 @@
 * previous v2 ciphering does no longer applies.
 * still only on 512B headers, no more
 * AES peripheral used in FW
-* .md analysis (new format ?)
+* .md new format
+  
+1. STM32 ReadOut Protection is set at Level 1
+2. Crypto algorithm has been replaced by an AES
+   * AES CBC and 128b  ✅
+3. CRC on firmware upgrade replaced
+   * CRC replaced by a SHA256 ✅  
+     SHA256 is to easy to tamper !
+   * ECDSA signature to verify for upgrade validation 😢
 
 ## Assumptions 
 
 1. ~~XXTEA configuration has changed~~ ❌
    1. ~~more rounds ==> NOPE (tested from 0 to 9)~~
    2. ~~hardcoded key has been modified ==> TBC with FW dump~~
-2. Crypto algorithm has been replaced by an AES
-   * Could be CBC and 128b : it is ✅
 
 ## Attack path
-
 
 1. 🚧 Dump Analysis with Ghidra (for an hardcoded key)  
    => looking for both, generic and specific keys 
 2. Flash content update to dump keys
-3. ST NFC chip replacement for changing mode (prod/test/idle)
-4. Performing attack on AES with a Known Plain text  
-   => requires a mean to generate as many ciphered as required with specific patterns in plain
+3. Flash hot swap
+4. Exploit
+5. ST NFC chip replacement for changing mode (prod/test/idle)
 
 ### 🚧 Dump Analysis
+**DIFFICULTY** : `EASY`  
+**REQUIRES** : materials that Lunii company might have left or incorrectly secured  
+**RESULTS** : None, everything is correctly  
 
 ### Flash content update
+**DIFFICULTY** : `IMPOSSIBLE`  
+**REQUIRES** : firmware with a correct signature  
+
+### Flash Hot Swap
+**DIFFICULTY** : `MEDIUM`  
+**REQUIRES** : hardware / electronic skills  
+**RESULTS** : Works and validated, first dump done with this method
 
 Empty fresh Lunii v3 start with requesting to pair
 ```C
@@ -66,218 +84,64 @@ event_loop() {
 ```
 
 (flash A is the Genuine)  
-1. Swap A to B with same contents
-2. Swap A to C,D,E,F,G (more and more modifications)
+1. Swap A to B
 
-#### Changes in "C" firmware
+#### Changes in "B" firmware
 
 * Lunii smilling picture replaced by Brightness Lamp 1/4
 * Mp3 pairing required replaced by birds
+* Full inernal flash is dumped in .md file instead of orignal contents (refer to DumpBootloader in ghidra project)
 
-From
-```
-   90018fe2 4B  F2  6E  10    movw       r0,#0xb16e
-   90018fe6 C9  F2  04  00    movt       r0=>BITMAP_LUNII_2 ,#0x9004
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_LUNII_2);
-
-        RTOS_start_UsbTask(1);
-
-   90018ff4 48  F6  4D  01    movw       r1,#0x884d
-   90018ff8 4C  F6  40  20    movw       r0,#0xca40
-   90018ffc C9  F2  01  01    movt       r1=>RTOS_createAPTask+1 ,#0x9001
-   90019000 C9  F2  04  00    movt       r0=>MP3_PAIR ,#0x9004
-   90019004 FD  F7  09  FA    bl         play_and_call
-        play_and_call(&MP3_PAIR,RTOS_createAPTask + 1);
-```
-
-To
-```
-   90018fe2 4F  F6  F2  40    movw       r0,#0xfcf2
-   90018fe6 C9  F2  06  00    movt       r0,#0x9006
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_BACKLIGHT_1);
-        
-        RTOS_start_UsbTask(1);
-        
-   90018ff4 48  F6  4D  01    movw       r1,#0x884d
-   90018ff8 4E  F6  A6  70    movw       r0,#0xefa6
-   90018ffc C9  F2  01  01    movt       r1=>RTOS_createAPTask+1 ,#0x9001
-   90019000 C9  F2  07  00    movt       r0,#0x9007
-   90019004 FD  F7  09  FA    bl         play_and_call
-        play_and_call(&MP3_BIRDS,RTOS_createAPTask + 1);
-```
-
-#### Changes in "D" firmware
-
-* Lunii smilling picture replaced by Brightness Lamp 2/4
-* Mp3 pairing required replaced by birds
-* Simple back and forth to FIRMWARE_EOF
-
-From
 ```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_LUNII_2);
-        RTOS_start_UsbTask(1);
-        play_and_call(&MP3_PAIR,RTOS_createAPTask + 1);
-      }
+  else {
+    HAL_FS_fileSeekWrite(fp,&FLASH_INT_0800,0,0xffff,&bytes_read_written);
+    HAL_FS_fileClose(fp);
+  }
 ```
 
-To
-```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_BACKLIGHT_2);
-        RTOS_start_UsbTask(1);
-        dump_code();
-      }
-      ...
+### Known plain text attack 💀 (NOPE)
+**DIFFICULTY** : `IMPOSSIBLE`
 
-void dump_code(void) {
-   play_and_call(&MP3_BIRDS,RTOS_createAPTask + 1);
-   return
-}
-```
-
-#### Changes in "E" firmware
-
-* Lunii smilling picture replaced by Brightness Lamp 3/4
-* Mp3 pairing required replaced by birds
-* Jump to FIRMWARE_EOF, Create dump.bin file and close
-
-
-From
-```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_LUNII_2);
-        RTOS_start_UsbTask(1);
-        play_and_call(&MP3_PAIR,RTOS_createAPTask + 1);
-      }
-```
-
-To
-```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_BACKLIGHT_3);
-        RTOS_start_UsbTask(1);
-        dump_code();
-      }
-      ...
-
-void dump_code(void) {
-   fp = HAL_FS_fileOpen("sd:0:/dump.bin",FA_OPEN_EXISTING);
-   HAL_FS_fileClose(fp);
-   play_and_call(&MP3_BIRDS,RTOS_createAPTask + 1);
-   return
-}
-```
-
-#### Changes in "F" firmware
-
-* Lunii smilling picture replaced by Brightness Lamp 4/4
-* Mp3 pairing required replaced by birds
-* Jump to FIRMWARE_EOF, Create dump.bin file write 0x200 from 0x0800be00, and close
-
-
-From
-```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_LUNII_2);
-        RTOS_start_UsbTask(1);
-        play_and_call(&MP3_PAIR,RTOS_createAPTask + 1);
-      }
-```
-
-To
-```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_BACKLIGHT_3);
-        RTOS_start_UsbTask(1);
-        dump_code();
-      }
-      ...
-
-void dump_code(void)
-{
-  FIL *fp;
-  
-  fp = HAL_FS_fileOpen("sd:0:/dump.bin",FA_WRITE|FA_CREATE_ALWAYS);
-  HAL_memcpy(fread_buffer,(byte *)AES_DEVICE_KEY,0x200);
-  f_write(fp,fread_buffer,0x200,(uint *)&story_buffer);
-  HAL_FS_fileClose(fp);
-  play_and_call(&MP3_BIRDS,RTOS_createAPTask + 1);
-  return;
-}
-```
-
-
-#### Changes in "G" firmware
-
-* Lunii smilling picture replaced by Brightness Lamp Ok
-* Mp3 pairing required replaced by birds
-* Jump to FIRMWARE_EOF, Create dump.bin write full internal flash, and close
-
-
-From
-```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_LUNII_2);
-        RTOS_start_UsbTask(1);
-        play_and_call(&MP3_PAIR,RTOS_createAPTask + 1);
-      }
-```
-
-To
-```C
-        HAL_SCR_displayPicture_fromBuffer(&BITMAP_BACKLIGHT_3);
-        RTOS_start_UsbTask(1);
-        dump_code();
-      }
-      ...
-
-void dump_code(void)
-{
-  FIL *fp;
-  int pos;
-  
-  fp = HAL_FS_fileOpen("sd:0:/dump.bin",FA_WRITE|FA_CREATE_ALWAYS);
-  pos = 0;
-  do {
-    HAL_memcpy(fread_buffer,(byte *)((int)0x0800000 + pos),0x200);
-    f_write(fp,fread_buffer,0x200,(uint *)&story_buffer);
-    pos = pos + 0x200;
-  } while (pos < 0xffff);
-  HAL_FS_fileClose(fp);
-  play_and_call(&MP3_BIRDS,RTOS_createAPTask + 1);
-  return;
-}
-```
-
-### Known plain text attack
-Using Lunii Wifi to set up a custom network config, for lunii storyteller to update wifi.prefs file.
+AES is strong, and key can't be retrieve with such attack
+~~Using Lunii Wifi to set up a custom network config, for lunii storyteller to update wifi.prefs file.
 Iterating through many wifi.prefs file generation with specific pattern injected in network conf might allow a known text attack. 
-
 To be investigated.  
-Using WIFI command LINK_FAH (Thanks to @Totol)
+Using WIFI command LINK_FAH (Thanks to @Totol)~~
+
+### Exploit
+**DIFFICULTY** : `HARD`  
+**REQUIRES** : Overflow in MainFW, missing check on a size
+
+Idea is to get an overflow to inject arbitrary code, ideally a small function that outputs the keys in a file on µSD  
 
 ### Backend auth token
 TBC
 
 
-# Keys
+# Keys (x3)
 
-Resources are deciphered through callbacks:
-* BMP : used with HAL_SCR_displayPicture_fromFile
-* MP3 : used in HAL_AUDIO_play, callback MP3_DEC_cb_read_plain
+* ✅ Device Key + IV (AES 128) 
+* .......  Story Key + IV (AES 128)
+* 💀 Update Signature (ECDSA secp256r1) - only public key
 
-## Assumption
-Lunii storyteller has a device specific key. All device files are ciphered with this key.
+### Assumption
+Lunii storyteller has a device specific key. All device files are ciphered with this key, including updates.
 Resources are ciphered with a generic key that is present in **bt** file. The later is ciphered with device key.  
 Reading a story requires to decipher **bt** file to load generic key and process stories.
 (Internal flash FW dump is required to confirm)
 
-## Generic
-Applies to all the devices
+## Device
 
 Applies to:
-* Sync token
-* .md file
-* bitmaps
-* mp3s
+* Firmware upgrade
+* Backend chalenges for pairing & signin 
 
 Functions:
 * HAL_CRYP_KeyDev_Decrypt
 * HAL_CRYP_KeyDev_Encrypt
   
-## Device
 Applies to a specific device
+
+## Story
+
+## Firmware Signature
