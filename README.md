@@ -33,18 +33,17 @@ Work in progress to extract the root key that seems to be the **device key**.
 ## Reverse state 📈  
 
 ### Bootloader - v3.0
-**NOTE** : Many code sections are not yet identified. Numbers might be overestimated
 | Code size | in KB |
 | - | -: |
 | Total FW size  | `47` |
 | Identified symbols | `35` |
 |  |  |
-> **73%** of firmware reversed and decompiled
+> **74%** of firmware reversed and decompiled
 
 | Symbols | count |
 | - | -: |
-| Total Symbols (fn + data) | `601` |
-| No yet identified | `125` |
+| Total Symbols (fn + data) | `603` |
+| No yet identified | `122` |
 |  |  |
 > **79%** of Symbols reversed and decompiled
 
@@ -52,14 +51,14 @@ Work in progress to extract the root key that seems to be the **device key**.
 | Code size | in KB |
 | - | -: |
 | Total FW size  | `582` |
-| Identified symbols | `509` |
+| Identified symbols | `510` |
 |  |  |
 > **87%** of firmware reversed and decompiled
 
 | Symbols | count |
 | - | -: |
 | Total Symbols (fn + data) | `2478` |
-| No yet identified | `484` |
+| No yet identified | `481` |
 |  |  |
 > **80%** of Symbols reversed and decompiled
 
@@ -69,6 +68,24 @@ Not yet started
 # Work in Progress
 
 ### TODO v3
+* Custom Firmware 🚧
+  * New bootloader 
+    * without FW signature 
+    * without RDP level 1
+    * should accept genuine updates and modified
+  * New MainFW with printf enabled
+  * MainFW is manual switch to test mode
+  * MainFW with story ciphering detection. Should support both
+    * encrypted stories
+    * custom stories
+* Jailbreak (good old times lovers)
+  * Describe procedure v1
+  * Identify procedure v2
+* Stories
+  * Install multiple official stories
+  * Decipher them
+  * Recipher for another Lunii + validate process
+  * Update python application for v3 support
 * Ghidra
   * on bootloader FW (expecting dump WIP)
     * ~~analyser la partie stdio avec reent~~
@@ -78,7 +95,7 @@ Not yet started
       ~~pq dans le fw on a 0x40 ???~~ --> signature ecdsa
     * ~~simuler le post hash avec un hash genuine (verifier qu'il recalcule correctement)~~
     * ~~recalculer un hash modifié~~ --> impossible sans la clé privée
-    * verifier que le blob du fw est bien la signature du sha256 du fw, avec la clé 
+    * ~~verifier que le blob du fw est bien la signature du sha256 du fw, avec la clé ~~ --> nope ecdsa signature to verify
     * ~~update process~~
     * ~~hash verification : WIP~~
       * ~~define type used~~ : SHA256

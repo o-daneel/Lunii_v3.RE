@@ -1,4 +1,5 @@
 - [TL;DR](#tldr)
+  - [Open questions](#open-questions)
   - [Facts](#facts)
   - [Assumptions](#assumptions)
   - [Attack path](#attack-path)
@@ -10,14 +11,23 @@
     - [Backend auth token](#backend-auth-token)
 - [Keys (x3)](#keys-x3)
     - [Assumption](#assumption)
-  - [Device](#device)
-  - [Story](#story)
+  - [Device Key](#device-key)
+  - [Story Key](#story-key)
   - [Firmware Signature](#firmware-signature)
 
 
 # TL;DR
-**Ciphering not yet DEFEATED...**  
+**Ciphering PARTIALLY defeated...**  
+* 1 out of N defeated
 
+## Open questions
+1. Is FW signature the same for all luniis ?  
+   (common EC key ?)  
+   Need to defeat another lunii (comming soon)
+2. Is story key same for all stories ?
+   (I guess it is not)
+3. Are device key & iv related between two luniis ?
+   (my guess is : NO, that would be a huge flaw)
 
 ## Facts
 * previous v2 ciphering does no longer applies.
@@ -130,7 +140,7 @@ Resources are ciphered with a generic key that is present in **bt** file. The la
 Reading a story requires to decipher **bt** file to load generic key and process stories.
 (Internal flash FW dump is required to confirm)
 
-## Device
+## Device Key
 
 Applies to:
 * Firmware upgrade
@@ -142,6 +152,6 @@ Functions:
   
 Applies to a specific device
 
-## Story
+## Story Key
 
 ## Firmware Signature
