@@ -13,18 +13,18 @@
 * External Flash : adesto AT25SF161 - 16MBits (2MB)
   QSPI interface
   * [Datasheet](docs/AT25SF161-Adesto.pdf)
+* ST25DV04K (I2C interface)
+  * [Datasheet](docs/st25dv04k.pdf)
+  * [AN5439 - Application note](docs/an5439-augmented-ndef-with-st25dvi2c-series-dynamic-nfc-tags-stmicroelectronics.pdf)
 * Wifi module : Espressif ESP32-MINI-1
   * [Datasheet](docs/esp32-mini-1_datasheet_en.pdf)
+* SD 8GB (SDIO interface)
 
 To be checked
 * Voltage Regulator : AP7362 (DIODES) 4.2v -> 3.3v
 * Battery Management System (BMS) :  
   * MCP73833
   * BQ25170
-* SD 16GB (SDIO interface)
-* ST25DV04K (I2C interface)
-  * [Datasheet](docs/st25dv04k.pdf)
-  * [AN5439 - Application note](docs/an5439-augmented-ndef-with-st25dvi2c-series-dynamic-nfc-tags-stmicroelectronics.pdf)
 * Audio ampli : 
   * PAM8019
   * MAX9792
@@ -44,7 +44,10 @@ To be checked
 | HW vers 2/2 | GPIO **D** | `0x00000002` |
 
 ### USART4
- TX:PA0(34)  / RX:PA1(35)  - Bootloader debug console
+> TX:PA0(34)  / RX:PA1(35)  - Bootloader debug console  
+> Red circle = GND
+
+![MCU UART](resources/pictures/v3/UART_MCU.png)
 
     (22:57:56.490) [BOOTLOADER]Bootloader v3.0
     (22:57:56.515) [BOOTLOADER]GPIO init
@@ -64,7 +67,11 @@ To be checked
     (22:58:01.270) [BOOTLOADER]Start Lunii firmware...
 
 ### USART8
- RX:PE0(141) / TX:PE1(142) - ESP uart line
+> RX:PE0(141) / TX:PE1(142) - ESP UART line   
+> Red circle = GND
+
+![ESP UART](resources/pictures/v3/UART_ESP.png)
+
 
     (20:56:14.521) ets Jul 29 2019 12:21:46
     (20:56:14.538) 
@@ -140,7 +147,14 @@ Check for pin mapping (UART4)
 ![STM32](resources/pictures/v2/STM32.jpg)
 
 ## External Flash & NFC Frontend
-![ExtFlash_NFC](resources/pictures/v3/ExtFlash_NFC.jpg)
+![ExtFlash_NFC](resources/pictures/v3/ST25DV.jpg)
+![ExtFlash_NFC](resources/pictures/v3/adesto_25SF161B.jpg)
 
 ## Battery
 ![Battery](resources/pictures/v3/Battery.jpg)
+
+## µSD
+![µSD](resources/pictures/v3/µSD.jpg)
+
+## JTAG & SWD
+![JTAG & SWD](resources/pictures/v3/JTAG_SWD.png)
