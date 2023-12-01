@@ -2,9 +2,12 @@
 
 from lunii_lib import *
 
-# login = sys.argv[1]
-# pwd = sys.argv[2]
+login = sys.argv[1]
+pwd = sys.argv[2]
 
+def get_luniis():
+    auth = get_authToken(login, pwd)
+    devices = get_devices(auth)
 
 def get_wifiPsk():
     auth = get_authToken(login, pwd)
@@ -33,7 +36,7 @@ def session():
     auth = get_authToken(login, pwd)
     devices = get_devices(auth)
     dev_signin(auth, devices[0], True)
-    dev_signout(auth, devices[0])
+    dev_signout(auth, devices[1])
 
 def start_pairing():
     auth = get_authToken(login, pwd)
@@ -41,10 +44,11 @@ def start_pairing():
 
 
 if __name__ == '__main__':
+    get_luniis()
     # get_wifiPsk()
     # get_allCmd()
     # get_settings()
     # get_update()
     # session()
-    start_pairing()
+    # start_pairing()
 

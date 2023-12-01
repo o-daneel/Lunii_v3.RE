@@ -53,6 +53,7 @@ def get_devices(json_auth, debug=False):
     
     for lun in devices:
         one_lunii = devices[lun]
+        # print(one_lunii)
         lunii_serial = one_lunii.get("serial_number", None)
         if lunii_serial:
             luniis.append(lunii_serial)
@@ -91,8 +92,11 @@ def dev_getSettings(json_auth, snu, debug=False):
 
 
 def dev_signin(json_auth, snu, debug=False):
-    body = {"vendorId": "0x0483", "productId": "0xa341", "firmwareVersion": "3.1.2", "sdCardSize": 1024, "sdCardFree": 1000, "sdCardUsed": 24,"batteryLevel": 95, "batteryCharging": False, "wifiLevel": 5, "wifiSsid": "LUNII_AP"}
-    rqt_challenge = requests.post(f"https://server-backend-prod.lunii.com/devices/{snu}/signin", headers=json_auth, json = body)
+    if snu.startswith("0020"):
+        body = {'firmware_version': '2.22_2.22', 'product_id': '0xa341', 'sd_card_size': 4022304768, 'vendor_id': '0x0483'}
+    else:
+        body = {"vendorId": "0x0483", "productId": "0xa341", "firmwareVersion": "3.1.2", "sdCardSize": 1024, "sdCardFree": 1000, "sdCardUsed": 24,"batteryLevel": 95, "batteryCharging": False, "wifiLevel": 5, "wifiSsid": "LUNII_AP"}
+    rqt_challenge = requests.post(f"https://server-backend-prod.lunii.com/devices/{snu}/signin?link=usb", headers=json_auth, json = body)
     print(rqt_challenge.json())
 
     challenge = rqt_challenge.json()['challenge']

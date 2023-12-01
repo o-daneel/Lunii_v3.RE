@@ -6,77 +6,55 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 import binascii
 
-def vectkey_to_bytes(key_vect):
-    joined = [k.to_bytes(4, 'little') for k in key_vect]
-    return b''.join(joined)
+
+def reverse_bytes(input_bytes):
+    if len(input_bytes) %4 != 0:
+        print("Input buffer must be modulo 4")
+        return None
+
+    groups_of_4 = [input_bytes[i:i+4] for i in range(0, len(input_bytes), 4)]
+    reversed_groups = [group[::-1] for group in groups_of_4]
+    final_key = b''.join(reversed_groups)
+
+    return final_key
+
 
 # internal flash personnalized value @0x0800BE00
-# AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
-raw_key_device = [0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC, 0xDDDDDDDD]
-dev_key = vectkey_to_bytes(raw_key_device)
-
-# 55555555 66666666 77777777 88888888
-raw_iv_device = [0x55555555, 0x66666666, 0x77777777, 0x88888888]
-dev_iv = vectkey_to_bytes(raw_iv_device)
-
-from  aes_keys import *
-
-# generic value read from bt file (ciphered with device key)
-# AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
-raw_key_generic = [0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC, 0xDDDDDDDD]
-gen_key = vectkey_to_bytes(raw_key_generic)
-
-# 55555555 66666666 77777777 88888888
-raw_iv_generic = [0x55555555, 0x66666666, 0x77777777, 0x88888888]
-gen_iv = vectkey_to_bytes(raw_iv_generic)
+raw_dev_key = b'00112233445566770011223344556677'
+dev_key = reverse_bytes(binascii.unhexlify(raw_dev_key))
+# internal flash personnalized value @0x0800BE10
+raw_dev_iv = b'8899AABBCCDDEEFF8899AABBCCDDEEFF'
+dev_iv = reverse_bytes(binascii.unhexlify(raw_dev_iv))
 
 
-def sample_code():
 
-    print(f"Key : {binascii.hexlify(dev_key)} | IV : {binascii.hexlify(dev_iv)}")
+def load_bt(key, iv, filename):
+    plain_bt = filename + ".plain"
 
-    s = b"xxtea is good"
+    # need to decipher the file first ?
+    if not os.path.isfile(plain_bt):
+        dec_file(dev_key, dev_iv, filename, ".plain")
 
-    # Crée un objet AES avec le mode CBC
-    decipher = AES.new(dev_key, AES.MODE_CBC, dev_iv)
-    cipher = AES.new(dev_key, AES.MODE_CBC, dev_iv)
+    # parsing the keys
+    with open(plain_bt, "rb") as fp:
+        story_key = reverse_bytes(fp.read(0x10))
+        story_iv = reverse_bytes(fp.read(0x10))
 
-    plain_hex = "323330323330333030313233343500000000000000000000323330323330333030313233343500000000000000000000"
-    plain = binascii.unhexlify(plain_hex)
-
-    # Chiffrage des données
-    ciphered = cipher.encrypt(plain)
-    ciphered_hex = binascii.hexlify(ciphered).decode('utf-8')
-
-    # Déchiffre les données
-    plain2 = decipher.decrypt(ciphered)
-    plain2_hex = binascii.hexlify(plain2).decode('utf-8')
-
-    # Affiche les données 
-    print(f"Plain    : {plain_hex}")
-    print(f"Ciphered : {ciphered_hex.upper()}")
-    print(f"Plain    : {plain2_hex}")
-
-    if plain == plain2:
-        print("👍")
-    else:
-        print("👎")
+    return story_key, story_iv
 
 
-def sample_file():
-    print("hello")
+def dec_md(key, iv, filename, extension):
+    dec_file(key, iv, filename, extension, 0x40, 0x30)
 
-    with open("../../dump/1362862A/rf/000/0ACBC5FB", "rb") as fp:
-        ciphered = fp.read(0x200)
-        print(len(ciphered))
-        print(ciphered)
-        ciph_hex = binascii.hexlify(ciphered)
-
-        print(ciph_hex)
-        dec = xxtea.decrypt(ciphered, lunii_generic_key, padding=False, rounds=lunii_tea_rounds(ciphered))
-        hexdec = binascii.hexlify(dec)
-        print(dec)
-        print(hexdec)
+    with open(filename+extension, "rb") as fp:
+        fp.seek(0x1A)
+        plain_snu = fp.read(0x18)
+        fp.seek(0x40)
+        ciph_snu1 = fp.read(0x18)
+        ciph_snu2 = fp.read(0x18)
+        assert plain_snu == ciph_snu1, f"\nplain : {binascii.hexlify(plain_snu)}\nciph1 : {binascii.hexlify(ciph_snu1)}"
+        assert plain_snu == ciph_snu2, f"\nplain : {binascii.hexlify(plain_snu)}\nciph1 : {binascii.hexlify(ciph_snu2)}"
+        print(f"Deciphered and validated for " +  plain_snu.decode("utf-8"))
 
 
 def dec_cmd(key, iv, filename, extension):
@@ -147,21 +125,27 @@ def dec_dir(key, iv, dirname, extension):
     print(res_list)
 
     for file in res_list:
-        dec_file(key, file, extension)
+        dec_file(key, iv, file, extension, 0, 0x200)
 
 
-def dec_story():
-    # dec_dir(lunii_generic_key, "../../dump/1362862A/", ".bin")
-    # dec_file(lunii_generic_key, "../../dump/root_sd/.md_p2", ".bin")
-    # dec_file(lunii_device_key, "../../dump/1362862A/bt_p1", ".bin")
-    pass
+def dec_story(key, iv, path):
+    story_key, story_iv = load_bt(key, iv, path + "/bt")
+    dec_dir(story_key, story_iv, path + "/rf/000/", ".bmp")
+    dec_dir(story_key, story_iv, path + "/sf/000/", ".mp3")
+
 
 if __name__ == '__main__':
-    # sample_code()
-    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash1.bin", 0x92000, 0x20)
-    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash2.bin", 0x92020, 0x20)
-    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/lunii1_main.bin", ".plain_hash3.bin", 0x92000, 0x40)
-    dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/fa.23023030035037.bin", ".plain")
-    dec_cmd(dev_key, dev_iv, "cmd.23023030035037.ONBOARDED", ".plain")
-    dec_cmd(dev_key, dev_iv, "cmd.23023030035037.RESET", ".plain")
-    
+
+    from  aes_keys_fred import *
+    dec_md(dev_key, dev_iv, "resources/flash_swap/md.Frederir.orig", ".plain")
+    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.2/fa.23023030012345.bin", ".plain")
+    # dec_cmd(dev_key, dev_iv, "cmd.23023030012345.ONBOARDED", ".plain")
+    # dec_cmd(dev_key, dev_iv, "cmd.23023030012345.RESET", ".plain")
+
+    from  aes_keys_daneel import *
+    # dec_file(dev_key, dev_iv, "dump/_v3/fw/3.1.3/fa.23456.bin", ".plain")
+    dec_md(dev_key, dev_iv, "dump/_v3/sd/odaneel/root/.md", ".plain")
+
+    # dec_story(dev_key, dev_iv, "dump/_v3/sd/odaneel/root/.content/DD2E29B7")
+    # dec_story(dev_key, dev_iv, "dump/_v3/sd/odaneel/root/.content/8171A964")
+

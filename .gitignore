@@ -6,6 +6,7 @@ ghidra/Lunii*.gpr
 ghidra/Lunii*.lock*
 ghidra/modules/newlib
 resources/pictures/**/*.jpg
+resources/flash_swap
 dump/*
 cube_workspace/
 ida

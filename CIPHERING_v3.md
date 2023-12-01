@@ -4,29 +4,27 @@
   - [Assumptions](#assumptions)
   - [Attack path](#attack-path)
     - [🚧 Dump Analysis](#-dump-analysis)
-    - [Flash content update](#flash-content-update)
-    - [Flash Hot Swap](#flash-hot-swap)
-    - [Known plain text attack 💀 (NOPE)](#known-plain-text-attack--nope)
+    - [❌ Flash content update](#-flash-content-update)
+    - [✅ Flash Hot Swap](#-flash-hot-swap)
+    - [✅ JTAG RAM Dump](#-jtag-ram-dump)
+    - [❌ Known plain text attack 💀 (NOPE)](#-known-plain-text-attack--nope)
     - [Exploit](#exploit)
     - [Backend auth token](#backend-auth-token)
 - [Keys (x3)](#keys-x3)
-    - [Assumption](#assumption)
+    - [~~Assumption~~ Facts](#assumption-facts)
   - [Device Key](#device-key)
   - [Story Key](#story-key)
   - [Firmware Signature](#firmware-signature)
 
 
 # TL;DR
-**Ciphering PARTIALLY defeated...**  
-* 1 out of N defeated
+**Device Ciphering PARTIALLY defeated...**  
+* 2 out of N defeated
+**Story Ciphering PARTIALLY defeated...**  
+* N defeated (depends on Device Ciphering)
 
 ## Open questions
-1. Is FW signature the same for all luniis ?  
-   (common EC key ?)  
-   Need to defeat another lunii (comming soon)
-2. Is story key same for all stories ?
-   (I guess it is not)
-3. Are device key & iv related between two luniis ?
+1. Are device key & iv related between two luniis ?
    (my guess is : NO, that would be a huge flaw)
 
 ## Facts
@@ -35,13 +33,20 @@
 * AES peripheral used in FW
 * .md new format
   
-1. STM32 ReadOut Protection is set at Level 1
+1. STM32 ReadOut Protection is set at Level 1  
+   (still allows some memory access, but not all)
 2. Crypto algorithm has been replaced by an AES
    * AES CBC and 128b  ✅
 3. CRC on firmware upgrade replaced
    * CRC replaced by a SHA256 ✅  
      SHA256 is to easy to tamper !
    * ECDSA signature to verify for upgrade validation 😢
+5. Is FW signature the same for all luniis ? **YES**  
+   (common EC key ?)  
+   Need to defeat another lunii (comming soon)
+6. Is story key same for all stories ? **NOPE** unique per story  
+   (I guess it is not)
+
 
 ## Assumptions 
 
@@ -53,21 +58,22 @@
 
 1. 🚧 Dump Analysis with Ghidra (for an hardcoded key)  
    => looking for both, generic and specific keys 
-2. Flash content update to dump keys
-3. Flash hot swap
-4. Exploit
-5. ST NFC chip replacement for changing mode (prod/test/idle)
+2. ❌ Flash content update to dump keys
+3. ✅ Flash hot swap
+4. ✅ JTAG RAM Dump
+5. Exploit
+6. ST NFC chip replacement for changing mode (prod/test/idle)
 
 ### 🚧 Dump Analysis
 **DIFFICULTY** : `EASY`  
 **REQUIRES** : materials that Lunii company might have left or incorrectly secured  
 **RESULTS** : None, everything is correctly  
 
-### Flash content update
+### ❌ Flash content update
 **DIFFICULTY** : `IMPOSSIBLE`  
 **REQUIRES** : firmware with a correct signature  
 
-### Flash Hot Swap
+### ✅ Flash Hot Swap
 **DIFFICULTY** : `MEDIUM`  
 **REQUIRES** : hardware / electronic skills  
 **RESULTS** : Works and validated, first dump done with this method
@@ -109,7 +115,12 @@ event_loop() {
   }
 ```
 
-### Known plain text attack 💀 (NOPE)
+### ✅ JTAG RAM Dump
+**DIFFICULTY** : `MEDIUM / EASY`  
+**REQUIRES** : soldering skills  
+**RESULTS** : Works and validated, stories have been deciphered using this method
+
+### ❌ Known plain text attack 💀 (NOPE)
 **DIFFICULTY** : `IMPOSSIBLE`
 
 AES is strong, and key can't be retrieve with such attack
@@ -131,27 +142,60 @@ TBC
 # Keys (x3)
 
 * ✅ Device Key + IV (AES 128) 
-* .......  Story Key + IV (AES 128)
+* ✅ Story  Key + IV (AES 128)
 * 💀 Update Signature (ECDSA secp256r1) - only public key
 
-### Assumption
-Lunii storyteller has a device specific key. All device files are ciphered with this key, including updates.
-Resources are ciphered with a generic key that is present in **bt** file. The later is ciphered with device key.  
-Reading a story requires to decipher **bt** file to load generic key and process stories.
+### ~~Assumption~~ Facts
+Lunii storyteller has a device specific key. All device files are ciphered with this key, including updates.  
+Resources are ciphered with a story dedicated key that is present in **bt** file. The later is ciphered with device key.  
+Reading a story requires to decipher **bt** file to load generic (key,iv) and process story.
 (Internal flash FW dump is required to confirm)
 
 ## Device Key
 
 Applies to:
 * Firmware upgrade
-* Backend chalenges for pairing & signin 
+* Backend challenges for pairing & signin 
+* wifi.prefs
 
 Functions:
-* HAL_CRYP_KeyDev_Decrypt
-* HAL_CRYP_KeyDev_Encrypt
+* `HAL_CRYP_KeyDev_Decrypt()`
+* `HAL_CRYP_KeyDev_Encrypt()`
   
 Applies to a specific device
 
 ## Story Key
+One per story, stored in **bt** file.
 
+Functions:
+* `HAL_CRYP_loadStoryKey()`
+ 
 ## Firmware Signature
+
+Made of ECDSA signature that can be verified against 
+
+> Public key (**unique for all Luniis**)
+
+      23 8A 11 E0 54 D8 87 3D 43 96 9A E7 AF 87 83 FE
+      14 97 D3 52 CA 2F 04 41 73 71 76 C0 30 1D AE 82 
+      A8 9F 8B 13 94 80 91 DD A3 B6 0D 46 EB E6 0F 44 
+      0F 85 60 A6 E7 92 8E 31 19 ED DC 37 77 49 52 13
+
+Same firmware for two different storytellers share the same signature.
+
+> Signature for Firmware - v3.1.2  
+
+      06 12 F2 AD F7 A7 03 29 26 C1 19 66 AE 88 0C D0
+      54 9E DC 51 FA 8F 80 41 2B C6 CD 17 A1 8B 8B DC
+      47 33 27 93 DE 31 61 22 61 E0 FC A3 97 90 FD 8B
+      B3 B8 37 19 4F 4B 71 EA 4E EE AD 9F D1 0D 0B 63
+
+> Signature for Firmware - v3.1.3  
+
+      65 F7 CF 56 A8 AF F8 34 75 96 44 2F DA 61 4F 8C
+      C2 8E 44 41 C9 65 62 57 14 03 D4 64 01 8D A7 F0
+      A6 80 A6 34 86 14 2A 2A 2A F2 2C B4 70 D4 71 0E
+      09 32 DE CC 4E C3 A9 74 A2 F5 EA CA D9 36 80 25
+
+**NOTE** :   
+Thanks to *public* key, we can only `verify()` the signature. Computing it, `sign()` requires the *private* key

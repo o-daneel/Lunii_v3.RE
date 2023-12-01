@@ -73,7 +73,7 @@ Not yet started
     * without FW signature ✅
     * without RDP level 1 🫣
     * should accept genuine updates and modified ✅ 
-  * New MainFW with printf enabled (need an extra to perform looong jump)
+  * New MainFW with printf enabled (need an extra to perform looong jump ⚠️)
   * MainFW is manual switch to test mode
 
   * MainFW with story ciphering detection. Should support both

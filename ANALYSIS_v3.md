@@ -1147,12 +1147,18 @@ For example, the "Suzanne et Gaston" story :
 * UUID : C4139D59-872A-4D15-8CF1-76D3`4CDF38C6`
 
 ### .content/XXXXYYYY/bt
-* **Length** : 0x40
+* **Length** : 0x20
 * **Key** : device specific
+**NOTE** : this format a changed in Lunii v3, compared to v2  
+  
+This file contains the Story keys. It is made of story Key an IV ciphered with Device key
 
-This file seems to be the authorization file that is checked to avoid illegal stories copy.
-
-It is made by ciphering the 0x40 first bytes for .ri file with device specific key.
+``` C
+typedef struct {
+    uint key[4];
+    uint iv[4];
+} story_key;
+```
 
 ### .content/XXXXYYYY/ni
 * **Length** : 0x200 + N*0x2C
