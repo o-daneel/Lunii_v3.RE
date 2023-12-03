@@ -3,6 +3,10 @@
 - [Firmwares](#firmwares)
   - [Memory layout](#memory-layout)
   - [Bootloader Firmware v3 (TBC)](#bootloader-firmware-v3-tbc)
+    - [Simple Boot](#simple-boot)
+    - [Upgrade Boot (v3.1.3)](#upgrade-boot-v313)
+    - [Failed Upgrade Boot](#failed-upgrade-boot)
+    - [Upgrade steps](#upgrade-steps)
   - [Device specific](#device-specific)
   - [Main Firmware](#main-firmware)
     - [Mapping](#mapping)
@@ -99,8 +103,11 @@ Three of them are of interest:
 
 ## Bootloader Firmware v3 (TBC)
 
-Console is still available on USART4 (PA0/1), on J3 Pin Header
+Console is still available on USART4 (PA0/1), on J3 Pin Header   
+(mode details [Hardware](HARDWARE_v3.md#usart4))
 
+
+### Simple Boot
     (22:57:56.490) [BOOTLOADER]Bootloader v3.0
     (22:57:56.515) [BOOTLOADER]GPIO init
     (22:57:56.515) [BOOTLOADER]DMA init
@@ -118,7 +125,54 @@ Console is still available on USART4 (PA0/1), on J3 Pin Header
     (22:57:59.535) [BOOTLOADER]Unmount result: 0
     (22:58:01.270) [BOOTLOADER]Start Lunii firmware...
 
-  
+### Upgrade Boot (v3.1.3)
+    [BOOTLOADER]Bootloader v3.0
+    [BOOTLOADER]GPIO init
+    [BOOTLOADER]DMA init
+    [BOOTLOADER]ADC3 init
+    [BOOTLOADER]SDMMC2 init
+    [BOOTLOADER]QUADSPI init
+    [BOOTLOADER]Battery level: 4088
+    [BOOTLOADER]check_STOP...
+    [BOOTLOADER]Check for firmware update file
+    [BOOTLOADER]SDMMC2 init
+    [BOOTLOADER]FATFS init
+    [BOOTLOADER]FATFS mounted
+    [BOOTLOADER]found fa.bin: 614464 bytes
+    erase block 00000000...
+    erase block 00010000...
+    erase block 00020000...
+    erase block 00030000...
+    erase block 00040000...
+    erase block 00050000...
+    erase block 00060000...
+    erase block 00070000...
+    erase block 00080000...
+    erase block 00090000...
+    [BOOTLOADER]writing: .......................................................................................................................................................[BOOTLOADER]614464 bytes written.
+    [BOOTLOADER]Unmount FATFS
+    [BOOTLOADER]Unmount result: 0
+    [BOOTLOADER]Start Lunii firmware...
+
+### Failed Upgrade Boot 
+    [BOOTLOADER]Bootloader v3.0
+    [BOOTLOADER]GPIO init
+    [BOOTLOADER]DMA init
+    [BOOTLOADER]ADC3 init
+    [BOOTLOADER]SDMMC2 init
+    [BOOTLOADER]QUADSPI init
+    [BOOTLOADER]Battery level: 4090
+    [BOOTLOADER]check_STOP...
+    [BOOTLOADER]Check for firmware update file
+    [BOOTLOADER]SDMMC2 init
+    [BOOTLOADER]FATFS init
+    [BOOTLOADER]FATFS mounted
+    [BOOTLOADER]found fa.bin: 598080 bytes
+    [BOOTLOADER]Unmount FATFS
+    [BOOTLOADER]Unmount result: 0
+    [BOOTLOADER]Start Lunii firmware...
+
+### Upgrade steps
 Bootloader process as following:
 1. Initialize many peripheral (FPU, RCC, GPIOF/C/A/D, ADC3, UART4, CRC, QSPI)
 2. Check that batt level not critical (or abort)
@@ -128,25 +182,20 @@ Bootloader process as following:
    3. mount sdcard
    4. Try to open `fa.bin`
    5. if exists
-      1. decipher the binary
-      2. compute Hash and check
-      3. if hash ok : erase sectors and write main firmware
+      1. decipher the binary into `fad.bin`
+      2. Check SHA256 FW Hash and verify ECDSA signature
+      3. if Signature verifed : erase sectors and write main firmware
       4. close, remove update file, umount SD
-4. Read main FW Hash and check it
+4. Check SHA256 FW Hash and verify ECDSA signature ([Public Key](CIPHERING_v3.md#firmware-signature))
 5. if failed, backup FW
-   1. Read backup FW Hash and check it
-   2. if Hash ok : erase sectors and write backup firmware to main 
+   1. Check SHA256 FW Hash and verify ECDSA signature
+   2. if Signature verifed : erase sectors and write backup firmware to main 
    3. if any error, dead loop
 6. Init QPSI (if not done yet)
 7. Switch to main FW
 
 This FW contains FatFs (different config) for SD access and performs read/write to QSPI flash though commands   
-It also contains storyteller identification data :
-* `0x0800BE00_0x0800BE0F` - AES DEVICE KEY  
-* `0x0800BE10_0x0800BE1F` - AES DEVICE IV  
-* `0x0800BE20_0x0800BE37` - SNU  
-* `0x0800BE48_0x0800BE57` - Wifi SSID  
-* `0x0800BE58_0x0800BE67` - Wifi Password
+It also contains storyteller identification data as decribed in the next [section](#device-specific)
 
 
 ## Device specific
@@ -164,16 +213,28 @@ It receives a text block (0x130 Bytes long) where everything must be hex text li
 |`0x0800BE20`|0x18|Unique identifier (SNU)|
 |`0x0800BE38`|0x10|TBD|
 |`0x0800BE48`|0x10|Wifi AP SSID|
-|`0x0800BE58`|0x10|Wifi AP Password|
-|`0x0800BE68`|0x30|TBD|
-|`0x0800BE98`|||
+|`0x0800BE58`|0x40|Wifi AP Password|
+|`0x0800BE98`|0x02|Backlight Max Level|
 
+
+```c
+// Perso area at 0x0800BE00
+typedef struct perso {
+    uint aes_key[4];
+    uint aes_iv[4];
+    char snu[0x18];
+    byte undef[0x10];
+    char wifi_ssid[0x10];
+    char wifi_pwd[0x40];
+    short backlight_level;
+} perso_dev;
+```
 
 ## Main Firmware
 The full firmware ! located at `0x90000000`  
 **Version :** 3.1.2   
 **Last Update :** 3.1.3   
-**Note :** This firmware can be updated
+**Note :** This firmware can be updated / downgraded
 
 ### Mapping
 
@@ -192,7 +253,7 @@ Few interesting offsets :
 A short mini firmware ! might be located at `0x90100000`   
 **Version :** 3.1.2   
 **Objective :** make sure that an USB mass storage is accessible for MainFW reload   
-**Note :** This firmware in not expected to be updated, nor updatable
+**Note :** This firmware in not expected to be updated, nor updatable (same as original 3.1.2 with BITMAP_VERSION that displays `3.1.2 Backup`)
 
 # Test Mode
 
@@ -886,26 +947,29 @@ TODO
 NOTE : **Ciphered files are only protected on first 0x200 block !**
 
 Keys :
-* <u>Generic</u> : stands for Generic Key (common to all sotrytellers)
-* <u>Device</u> : stands for Device Key (specific to one specific device)
+* <u>Story</u> : stands for Story Key (unique per Story)
+* <u>Device</u> : stands for Device Key (unique per device)
 
 | File | Key | Contents|
 |-|-|-|
 |[`sd:0:\.pi`](#pi) | None | Pack Index<br>recreated by main FW |
-|[`sd:0:\.md`](#md) | Generic | Metadata<br>(contents from internal flash, two block of 512B, 1st with SNU, 2nd with ciphered data and Key_B)
+|[`sd:0:\.md`](#md) | Story | Metadata<br>(contents from internal flash, two block of 512B, 1st with SNU, 2nd with ciphered data and Key_B)
 |[`sd:0:\.cfg`](#cfg) | None | Configuration file |
 |[`sd:0:\.nm`](#nm) | None | Night mode enabled if file exists (paramters are loaded from [config file](#cfg))
-|`sd:0:\version` | None | contains a simple date      
+|[`sd:0:\version`](#version) | None | contains a simple date      
+|[`sd:0:\wifi.prefs`](#wifiprefs) | Device | Contains all configured Wifi      
+|[`sd:0:\.bgt`](#bgt) | None | Brightness level configuration      
+|[`sd:0:\.logo`](#logo) | None | Custom logo configured in the account      
 |[`sd:0:\.content\XXXXXXXX\bt`](#contentxxxxyyyybt) | Device | Authoriaztion file. To validate that this device is authorized to play this story  |
-|`sd:0:\.content\XXXXXXXX\li` | Generic | Action Nodes index |
+|[`sd:0:\.content\XXXXXXXX\li`](#contentxxxxyyyyli) | Story | Action Nodes index |
 |[`sd:0:\.content\XXXXXXXX\ni`](#contentxxxxyyyyni) | None | Stage Nodes index |
 |`sd:0:\.content\XXXXXXXX\nm` | None | Night Mode related |
-|[`sd:0:\.content\XXXXXXXX\ri`](#contentxxxxyyyyri) | Generic | Resource Index : Ciphered text file that contains resource list   
-|[`sd:0:\.content\XXXXXXXX\si`](#contentxxxxyyyysi) | Generic | Story Index : Ciphered text file that contains story list   
+|[`sd:0:\.content\XXXXXXXX\ri`](#contentxxxxyyyyri) | Story | Resource Index : Ciphered text file that contains resource list   
+|[`sd:0:\.content\XXXXXXXX\si`](#contentxxxxyyyysi) | Story | Story Index : Ciphered text file that contains story list   
 |`sd:0:\.content\XXXXXXXX\rf\` | N/A | Resource Folder 
-|[`sd:0:\.content\XXXXXXXX\rf\000\YYYYYYYY`](#contentxxxxyyyyrf000yyyyyyyy) | Generic | Resources (BMP)  
+|[`sd:0:\.content\XXXXXXXX\rf\000\YYYYYYYY`](#contentxxxxyyyyrf000yyyyyyyy) | Story | Resources (BMP)  
 |`sd:0:\.content\XXXXXXXX\sf\` | N/A | Story Folder
-|[`sd:0:\.content\XXXXXXXX\sf\000\YYYYYYYY`](#contentxxxxyyyysf000yyyyyyyy) | Generic | Story, audio part and heros names (MP3)
+|[`sd:0:\.content\XXXXXXXX\sf\000\YYYYYYYY`](#contentxxxxyyyysf000yyyyyyyy) | Story | Story, audio part and heros names (MP3)
 
 ## Stories Format
 ### Resources : BMP
@@ -1043,12 +1107,12 @@ struct wifi_entry {
 struct wifi_entry WIFI_CONF[WIFI_ENTRY_SIZE];
 ```
 
-Symboles using 
-* CONFIG_LOAD_wifi.prefs
-* WIFI_CONF 
-* WIFI_addNetConf
-* WIFI_getNetConf
-* WIFI_udpateNetPwd
+Symbols using 
+* `CONFIG_LOAD_wifi.prefs()`
+* `WIFI_CONF()`
+* `WIFI_addNetConf()`
+* `WIFI_getNetConf()`
+* `WIFI_udpateNetPwd()`
 
 ### .bgt
 * **Length** : 0x01

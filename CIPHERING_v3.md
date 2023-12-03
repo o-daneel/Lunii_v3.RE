@@ -24,8 +24,10 @@
 * N defeated (depends on Device Ciphering)
 
 ## Open questions
-1. Are device key & iv related between two luniis ?
-   (my guess is : NO, that would be a huge flaw)
+1. Are device key & iv related between two luniis ?  
+   (my guess is : **NO**, that would be a huge flaw)
+2. What is the 0x10 bytes long data undefined in perso area ?
+   * not ciphered with device key
 
 ## Facts
 * previous v2 ciphering does no longer applies.
@@ -120,6 +122,25 @@ event_loop() {
 **REQUIRES** : soldering skills  
 **RESULTS** : Works and validated, stories have been deciphered using this method
 
+#### HowTO
+
+1. Solder the SWD connector on the right like [here](HARDWARE_v3.md#jtag--swd)  
+   *Pins from top to bottom*
+   | Pin | Comment |  
+   |-|-|
+   |SWDIO| To be connected |
+   |GND| To be connected |
+   |SWCLK| To be connected |
+   |3v3| DO NOT CONNECT |
+   |NRST| To be connected |
+2. Install STLink Utility ([here](./tools/en.stsw-link004.zip)), or download it from STMicro website (requires account creation)
+3. Connect your ST Link v2 to your PC (USB device must be detected and recognized)
+4. PowerUp Lunii
+5. Update Address and Size to `0x20018650` & `0x20`, press ENTER  
+   (**only applies to v3.1.2**, to be reviewed for 3.1.3)
+6. Connect to target
+7. Save to a file. You have your Device IV & Key
+
 ### ❌ Known plain text attack 💀 (NOPE)
 **DIFFICULTY** : `IMPOSSIBLE`
 
@@ -181,7 +202,7 @@ Made of ECDSA signature that can be verified against
       A8 9F 8B 13 94 80 91 DD A3 B6 0D 46 EB E6 0F 44 
       0F 85 60 A6 E7 92 8E 31 19 ED DC 37 77 49 52 13
 
-Same firmware for two different storytellers share the same signature.
+Same firmware for two different storytellers share the same signature.  
 
 > Signature for Firmware - v3.1.2  
 

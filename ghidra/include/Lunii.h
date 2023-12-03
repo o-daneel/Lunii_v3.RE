@@ -32,7 +32,15 @@ typedef struct ecdsa_secp256r1{
     void * callback3;
 } ecdsa_params;
 
-
+typedef struct perso {
+    uint aes_key[4];
+    uint aes_iv[4];
+    char snu[0x18];
+    byte undef[0x10];
+    char wifi_ssid[0x10];
+    char wifi_pwd[0x40];
+    short backlight_level;
+} perso_dev;
 
 typedef enum FATFS_OPEN_MODE { /* File access mode and open method flags (3rd argument of f_open) */
     FA_OPEN_EXISTING=0,

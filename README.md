@@ -76,6 +76,15 @@ Not yet started
   * New MainFW with printf enabled (need an extra to perform looong jump ⚠️)
   * MainFW is manual switch to test mode
 
+      0800812c 4F  F4  80  61    mov.w      r1,#0x400
+      08008130 3C  48           ldr        r0=>Peripherals::GPIOA ,[DAT_08008224 ]           = 40020000h
+      08008132 F9  F7  F7  FE    bl         HAL_GPIO_ReadPin                                 GPIO_PinState HAL_GPIO_ReadPin(G
+      08008136 78  B1           cbz        r0,LAB_08008158
+
+        GVar3 = HAL_GPIO_ReadPin((GPIO_TypeDef *)&Peripherals::GPIOA,0x400);
+        if (GVar3 != GPIO_PIN_RESET) {
+
+
   * MainFW with story ciphering detection. Should support both
     * encrypted stories
     * custom stories
@@ -83,9 +92,9 @@ Not yet started
   * Describe procedure v1
   * Identify procedure v2
 * Stories
-  * Install multiple official stories
-  * Decipher them
-  * Recipher for another Lunii + validate process
+  * Install multiple official stories ✅
+  * Decipher them ✅
+  * Recipher for another Lunii + validate process 
   * Update python application for v3 support
 * Ghidra
   * on bootloader FW (expecting dump WIP)
