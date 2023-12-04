@@ -11,17 +11,26 @@
     - [Exploit](#exploit)
     - [Backend auth token](#backend-auth-token)
 - [Keys (x3)](#keys-x3)
-    - [~~Assumption~~ Facts](#assumption-facts)
+    - [~~Assumption~~ \> Facts](#assumption--facts)
   - [Device Key](#device-key)
   - [Story Key](#story-key)
   - [Firmware Signature](#firmware-signature)
 
 
 # TL;DR
+
 **Device Ciphering PARTIALLY defeated...**  
-* 2 out of N defeated
+* 2 out of N defeated  
+
 **Story Ciphering PARTIALLY defeated...**  
 * N defeated (depends on Device Ciphering)
+
+No need to go further: 
+
+>**> Ciphering Defeated 😎**  
+>Being able to extract the story keyset on a specific Lunii, for a given story "A", offers the capability to cipher all custom stories using this specific key of Story "A".  
+Any Lunii owner that officially owns Story A, has the corresponding **bt** file (refer to this [section](ANALYSIS_v3.md#contentxxxxyyyybt)). So the same **bt** file can be reused for custom stories to have a correct cipehring of custom story key without having to know the internal device keys... 🤟  
+**All greatings to Dantsu for the idea 👏**
 
 ## Open questions
 1. Are device key & iv related between two luniis ?  
@@ -122,7 +131,7 @@ event_loop() {
 **REQUIRES** : soldering skills  
 **RESULTS** : Works and validated, stories have been deciphered using this method
 
-#### HowTO
+#### HowTo
 
 1. Solder the SWD connector on the right like [here](HARDWARE_v3.md#jtag--swd)  
    *Pins from top to bottom*
@@ -134,17 +143,37 @@ event_loop() {
    |3v3| DO NOT CONNECT |
    |NRST| To be connected |
 2. Install STLink Utility ([here](./tools/en.stsw-link004.zip)), or download it from STMicro website (requires account creation)
+   
+##### Extract device keys
 3. Connect your ST Link v2 to your PC (USB device must be detected and recognized)
-4. PowerUp Lunii
-5. Update Address and Size to `0x20018650` & `0x20`, press ENTER  
-   (**only applies to v3.1.2**, to be reviewed for 3.1.3)
-6. Connect to target
-7. Save to a file. You have your Device IV & Key
+4. Connect Lunii USB C to PC, in order to start onto mass storage directly
+5. PowerUp Lunii
+6. Update Address and Size to (depending on your fw version)
+   *  **v3.1.2** : `0x20018650` & `0x20`, press ENTER  
+   *  **v3.1.3** : `0x20018584` & `0x20`, press ENTER  
+7. Connect to target
+8. Save to a file. You have your Device IV & Key
+9. Disconnect from STLink and power off the Lunii
+
+##### Extract story keys
+(this method allows to get story key without having to decipher bt file externally)
+
+Repeat all previous steps from [previous section](#extract-device-keys).  
+
+3. Connect your ST Link v2 to your PC (USB device must be detected and recognized)
+4. PowerUp your Lunii
+5. Turn the wheel to select the story
+6. Update Address and Size to (depending on your fw version)
+   *  **v3.1.2** : `0x20018650` & `0x20`, press ENTER  
+   *  **v3.1.3** : `0x20018584` & `0x20`, press ENTER  
+7. Connect to target
+8. Save to a file. You have your Story IV & Key
+9. Disconnect from STLink and power off the Lunii
 
 ### ❌ Known plain text attack 💀 (NOPE)
 **DIFFICULTY** : `IMPOSSIBLE`
 
-AES is strong, and key can't be retrieve with such attack
+AES is strong, and key can't be retrieved with such attack  
 ~~Using Lunii Wifi to set up a custom network config, for lunii storyteller to update wifi.prefs file.
 Iterating through many wifi.prefs file generation with specific pattern injected in network conf might allow a known text attack. 
 To be investigated.  
@@ -166,7 +195,7 @@ TBC
 * ✅ Story  Key + IV (AES 128)
 * 💀 Update Signature (ECDSA secp256r1) - only public key
 
-### ~~Assumption~~ Facts
+### ~~Assumption~~ > Facts
 Lunii storyteller has a device specific key. All device files are ciphered with this key, including updates.  
 Resources are ciphered with a story dedicated key that is present in **bt** file. The later is ciphered with device key.  
 Reading a story requires to decipher **bt** file to load generic (key,iv) and process story.
