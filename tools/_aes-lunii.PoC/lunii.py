@@ -137,6 +137,14 @@ def dec_story(key, iv, path):
     dec_file(story_key, story_iv, path + "/li", ".plain", 0, 512)
 
 
+def dec_all_bt(key, iv, path):
+    bt_list = glob.glob(path + "/*/bt")
+    for bt in bt_list:
+        dec_file(key, iv, bt, ".plain")
+        uuid_dir = os.path.basename(os.path.dirname(bt))
+        os.rename(bt + ".plain", f"{path}/bt.{uuid_dir.upper()}.plain")
+
+
 # Decipher one file
 def enc_file(key, iv, filename, extension, offset = 0, enc_len = 0):
     if not pathlib.Path(filename).is_file():

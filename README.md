@@ -18,7 +18,8 @@ Even if you don't, children will 😁**
 
 # TL;DR v2
 Too long, didn't read ?    
-Many people doesn't care about about software security. There Lunii's company failed in many ways:
+Many people doesn't care about about software security.   
+There, Lunii's company failed in many ways:
 1. JTAG is still enabled on the PCB (allows internal flash dump)
 2. External Flash is not ciphered (allows dump)
 3. UART is enabled, then provides a lot of debug
@@ -27,8 +28,19 @@ Many people doesn't care about about software security. There Lunii's company fa
 
 # TL;DR v3
 Too long, didn't read ?    
-They learnt from previous section ! 😅
-Work in progress to extract the root key that seems to be the **device key**.
+They learnt from previous section ! 😅 but not that much finally ==> **Ciphering defeated.**  
+  
+More recommendations to learn for Lunii :
+1. JTAG is still enabled !!! 🤦‍♂️ (allows internal flash dump, little bit more complex, but still possible)
+2. External Flash is not ciphered (allows dump)
+3. UART is enabled, then provides a lot of debug
+4. Firmware embeds too many debug strings helping decompiling
+5. No anti rollback on FW upgrades
+
+What they improved :
+1. XXTEA is replaced with a well known and recommended AES CBC 👍
+2. CRC is replaced with a fucking strong ECDSA signature 👍👍
+3. JTAG ReadOut Protection Level 1 🫤
 
 ## Reverse state 📈  
 
@@ -36,16 +48,16 @@ Work in progress to extract the root key that seems to be the **device key**.
 | Code size | in KB |
 | - | -: |
 | Total FW size  | `47` |
-| Identified symbols | `35` |
+| Identified symbols | `36` |
 |  |  |
-> **74%** of firmware reversed and decompiled
+> **76%** of firmware reversed and decompiled
 
 | Symbols | count |
 | - | -: |
 | Total Symbols (fn + data) | `603` |
-| No yet identified | `122` |
+| No yet identified | `119` |
 |  |  |
-> **79%** of Symbols reversed and decompiled
+> **80%** of Symbols reversed and decompiled
 
 ### Main FW - v3.1.2
 | Code size | in KB |
@@ -63,7 +75,19 @@ Work in progress to extract the root key that seems to be the **device key**.
 > **80%** of Symbols reversed and decompiled
 
 ### Main FW - v3.1.3
-Not yet started
+| Code size | in KB |
+| - | -: |
+| Total FW size  | `582` |
+| Identified symbols | `31` |
+|  |  |
+> **5%** of firmware reversed and decompiled
+
+| Symbols | count |
+| - | -: |
+| Total Symbols (fn + data) | `1939` |
+| No yet identified | `1140` |
+|  |  |
+> **41%** of Symbols reversed and decompiled
 
 # Work in Progress
 
@@ -73,7 +97,8 @@ Not yet started
     * without FW signature ✅
     * without RDP level 1 🫣
     * should accept genuine updates and modified ✅ 
-  * New MainFW with printf enabled (need an extra to perform looong jump ⚠️)
+  * New MainFW with printf enabled (need an extra to perform looong jump ⚠️)  
+    (requires SWD debug working)
   * MainFW is manual switch to test mode
 
       0800812c 4F  F4  80  61    mov.w      r1,#0x400
@@ -94,7 +119,7 @@ Not yet started
 * Stories
   * Install multiple official stories ✅
   * Decipher them ✅
-  * Recipher for another Lunii + validate process 
+  * Recipher for another Lunii + validate process ✅
   * Update python application for v3 support
 * Ghidra
   * on bootloader FW (expecting dump WIP)
@@ -128,19 +153,6 @@ Not yet started
     * ~~Review Wifi AP server & commands~~
 * check XXTEA on new v3 files : **FAILED**
 * AES crypto : **confirmed**
-
-### TODO v2
-* Describe test mode / Try it
-* Deep dive in file section to understand format
-  * .nm : Night mode (to be tested)
-* Decompile 
-  * Main FW : in progress > [Main Firmware](ANALYSIS.md#main-firmware) 
-* Firmware management
-  * Try loading firmware update
-  * Create custom firmware (simple internal picture update)
-  * Restore original FW
-  * Insert dummy patch (just back and forth) + try it (using custom picture)
-  * Make less dummy patch with printf call (can't be read without UART acces)
 
 ### DONE
 * Deep dive in file section to understand format

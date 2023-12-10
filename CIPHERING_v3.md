@@ -9,7 +9,7 @@
     - [✅ JTAG RAM Dump](#-jtag-ram-dump)
     - [❌ Known plain text attack 💀 (NOPE)](#-known-plain-text-attack--nope)
     - [Exploit](#exploit)
-    - [Backend auth token](#backend-auth-token)
+    - [Backend API usage](#backend-api-usage)
 - [Keys (x3)](#keys-x3)
     - [~~Assumption~~ \> Facts](#assumption--facts)
   - [Device Key](#device-key)
@@ -185,8 +185,14 @@ Using WIFI command LINK_FAH (Thanks to @Totol)~~
 
 Idea is to get an overflow to inject arbitrary code, ideally a small function that outputs the keys in a file on µSD  
 
-### Backend auth token
-TBC
+### Backend API usage
+**DIFFICULTY** : `To Be Confirmed`  
+**REQUIRES** : Proper understanding of APK flow
+
+Idea is to rely on custom story feature from Lunii Android App. This feature might be comparable to a ciphering service.
+You push a recorded mp3 and the service cipher it and makes a story from it.  
+
+It should be possible to push different kind of files (ri/si/ni/rf/sf ...) to cipher them and recreate an official custom story.
 
 
 # Keys (x3)
