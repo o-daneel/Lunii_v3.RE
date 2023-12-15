@@ -29,18 +29,22 @@ There, Lunii's company failed in many ways:
 # TL;DR v3
 Too long, didn't read ?    
 They learnt from previous section ! 😅 but not that much finally ==> **Ciphering defeated.**  
-  
-More recommendations to learn for Lunii :
-1. JTAG is still enabled !!! 🤦‍♂️ (allows internal flash dump, little bit more complex, but still possible)
-2. External Flash is not ciphered (allows dump)
-3. UART is enabled, then provides a lot of debug
-4. Firmware embeds too many debug strings helping decompiling
-5. No anti rollback on FW upgrades
+I hope they haven't paid an expensive security expert for a 45days analysis to defeat the firmware 😘  
 
 What they improved :
 1. XXTEA is replaced with a well known and recommended AES CBC 👍
-2. CRC is replaced with a fucking strong ECDSA signature 👍👍
-3. JTAG ReadOut Protection Level 1 🫤
+2. Two layers of cryptography with diversified keys 👍
+3. CRC is replaced with a fucking strong ECDSA signature 👍👍
+4. JTAG ReadOut Protection Level 1 🫤
+
+More recommendations to learn for Lunii :
+1. You have the binary means you have the sources !
+2. JTAG is still enabled !!! 🤦‍♂️ (allows internal flash dump, little bit more complex, but still possible)
+3. External Flash is not ciphered (allows dump)
+4. UART is enabled, then provides a lot of debug
+5. Firmware embeds too many debug strings helping decompiling
+6. No anti rollback on FW upgrades
+7. Two crypto layers that are not so linked, not tight enough
 
 ## Reverse state 📈  
 
