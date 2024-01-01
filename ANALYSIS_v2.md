@@ -18,7 +18,6 @@
   - [Thoughts](#thoughts)
     - [Firmware CRC](#firmware-crc)
     - [Custom firmware](#custom-firmware)
-      - [Boot procedure](#boot-procedure)
     - [NFC chip](#nfc-chip)
     - [Finding SD Ciphering](#finding-sd-ciphering)
 - [Crypt-Analysis](#crypt-analysis)
@@ -33,10 +32,6 @@
     - [Audio : MP3](#audio--mp3)
     - [Indexes](#indexes)
   - [Files Format](#files-format)
-    - [/.bgt](#bgt)
-    - [/wifi.prefs](#wifiprefs)
-    - [/cmd](#cmd)
-    - [/version](#version)
     - [.md](#md)
     - [.pi](#pi)
     - [.cfg](#cfg)
@@ -390,14 +385,6 @@ Indexes files :
 4) **si** : [Story index](#contentxxxxyyyysi)
 
 ## Files Format
-### /.bgt
-Brightness
-
-### /wifi.prefs
-### /cmd
-### /version
-
-
 ### .md
 * **Length** : 0x200
 * **Key** : plain / generic
