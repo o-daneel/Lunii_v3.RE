@@ -93,6 +93,21 @@ More recommendations to learn for Lunii :
 |  |  |
 > **41%** of Symbols reversed and decompiled
 
+### Main FW - v3.1.4
+| Code size | in KB |
+| - | -: |
+| Total FW size  | `592` |
+| Identified symbols | `510` |
+|  |  |
+> **86%** of firmware reversed and decompiled
+
+| Symbols | count |
+| - | -: |
+| Total Symbols (fn + data) | `2092` |
+| No yet identified | `515` |
+|  |  |
+> **75%** of Symbols reversed and decompiled
+
 # Work in Progress
 
 ### TODO v3
@@ -190,9 +205,9 @@ More recommendations to learn for Lunii :
   
 # Links / Similar repos
 * [Lunii - Pack Manager CLI](https://github.com/o-daneel/Lunii.PACKS)
+* [Lunii - Qt Manager](https://github.com/o-daneel/Lunii.Qt)
 * [TBD Lunii 1/2](https://www.youtube.com/watch?v=ZeYKieOIsC8&t=9s) - [TBD Lunii 2/2](https://www.youtube.com/watch?v=GItJg34bOk0)
 * [LuniiOs](https://github.com/bastien8060/Lumiios) - a python player implementation
-* [linux-cli](https://github.com/Wameuh/lunii-cli) (Did the same reverse analysis 😥 in July 2022, i'm late)
 * [(Hackday) Tsukuyomi Hacking Lunii](https://hackaday.io/project/167629-tsukuyomi)
 * [(GitHub) Tsukuyomi](https://github.com/danksz/tsukuyomi)
 * [STUdio - Story Teller Unleashed](https://marian-m12l.github.io/studio-website/)

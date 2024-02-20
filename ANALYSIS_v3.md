@@ -1124,7 +1124,7 @@ The brightness must be in range `0-100`
 
 ### .md
 * **Length** : 0x70 (112B)
-* **Key** : plain / generic
+* **Key** : plain / device
 
 Structure:
 
@@ -1135,7 +1135,9 @@ Structure:
                                                    > 3.1.2 
 323330323330333132333435363700000000000000000000 : SNU - Storyteller Unique ID  (24 Bytes)
                                                    > 23023031234567 
-0000830441A30000 (Static)
+830441A3 : USB Vendor ID / Product ID (8 Bytes)
+         > VID 0x8304, PID 0x41A3
+0000 : undef / padding (TBC)
 00000001 : Hardware version major
 00000010 : Hardware version minor
            > v1.10
@@ -1144,8 +1146,6 @@ Structure:
   `--- Second 48B Block --- CIPHERED ---`  
 Contains the device key, ciphered with generic key
 ``` 
-v3 :
-    SNU copied twice and ciphered
     323330323330333132333435363700000000000000000000 : SNU - Storyteller Unique ID  (24 Bytes)
                                                        > 23023031234567 
     323330323330333132333435363700000000000000000000 : SNU - Storyteller Unique ID  (24 Bytes)

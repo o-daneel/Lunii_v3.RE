@@ -78,7 +78,7 @@ Any Lunii owner that officially owns Story A, has the corresponding **bt** file 
 ### 🚧 Dump Analysis
 **DIFFICULTY** : `EASY`  
 **REQUIRES** : materials that Lunii company might have left or incorrectly secured  
-**RESULTS** : None, everything is correctly  
+**RESULTS** : None, everything is correctly secured
 
 ### ❌ Flash content update
 **DIFFICULTY** : `IMPOSSIBLE`  
@@ -151,6 +151,7 @@ event_loop() {
 6. Update Address and Size to (depending on your fw version)
    *  **v3.1.2** : `0x20018650` & `0x20`, press ENTER  
    *  **v3.1.3** : `0x20018584` & `0x20`, press ENTER  
+   *  **v3.1.4** : `0x2001ADD0` & `0x20`, press ENTER  
 7. Connect to target
 8. Save to a file. You have your Device IV & Key
 9. Disconnect from STLink and power off the Lunii
@@ -166,6 +167,7 @@ Repeat all previous steps from [previous section](#extract-device-keys).
 6. Update Address and Size to (depending on your fw version)
    *  **v3.1.2** : `0x20018650` & `0x20`, press ENTER  
    *  **v3.1.3** : `0x20018584` & `0x20`, press ENTER  
+   *  **v3.1.4** : `0x2001ADD0` & `0x20`, press ENTER  
 7. Connect to target
 8. Save to a file. You have your Story IV & Key
 9. Disconnect from STLink and power off the Lunii
